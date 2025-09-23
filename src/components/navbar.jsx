@@ -1,80 +1,72 @@
-import logo from "@/assets/react.svg";
-
-
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import logo from "@/assets/logo.svg";
+import { User, Menu } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import {
     NavigationMenu,
     NavigationMenuItem,
-    NavigationMenuLink,
     NavigationMenuList,
-} from "@/components/ui/navigation-menu"
+} from "@/components/ui/navigation-menu";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import { Link } from "react-router-dom";
 
-// Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
-    { href: "#", label: "Home", active: true },
-    { href: "#", label: "Study Planner", active: true },
-    { href: "#", label: "Task List", active: true },
-    { href: "#", label: "Settings", active: true },
-]
+    { path: "/Home", label: "Home" },
+    { path: "/StudyPlanner", label: "Study Planner" },
+    { path: "/TaskList", label: "Task List" },
+    { path: "/Settings", label: "Settings" },
+];
+
 export default function Component() {
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const isScrolled = window.scrollY > 10;
+            setScrolled(isScrolled);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
     return (
-        <header className="border-b px-4 md:px-6">
-            <div className="flex h-16 items-center justify-between gap-4">
+        <header className={`fixed top-0 left-0 w-full z-50 border-b px-2 sm:px-4 md:px-6 lg:px-8 transition-colors duration-300 ${
+            scrolled
+                ? "bg-blue-500 text-white border-blue-600"
+                : "bg-white dark:bg-background"
+        }`}>
+            <div className="flex h-14 sm:h-16 items-center justify-between gap-2 sm:gap-4">
                 {/* Left side */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                     {/* Mobile menu trigger */}
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
-                                className="group size-8 md:hidden"
+                                className={`group size-7 sm:size-8 sm:hidden ${
+                                    scrolled ? "text-white hover:bg-blue-600" : ""
+                                }`}
                                 variant="ghost"
                                 size="icon"
                             >
-                                <svg
-                                    className="pointer-events-none"
-                                    width={16}
-                                    height={16}
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M4 12L20 12"
-                                        className="origin-center -translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-[315deg]"
-                                    />
-                                    <path
-                                        d="M4 12H20"
-                                        className="origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)] group-aria-expanded:rotate-45"
-                                    />
-                                    <path
-                                        d="M4 12H20"
-                                        className="origin-center translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-y-0 group-aria-expanded:rotate-[135deg]"
-                                    />
-                                </svg>
+                                <Menu className="size-4" />
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent align="start" className="w-36 p-1 md:hidden">
+                        <PopoverContent align="start" className="w-36 p-1 sm:hidden">
                             <NavigationMenu className="max-w-none *:w-full">
                                 <NavigationMenuList className="flex-col items-start gap-0 md:gap-2">
                                     {navigationLinks.map((link, index) => (
                                         <NavigationMenuItem key={index} className="w-full">
-                                            <NavigationMenuLink
-                                                href={link.href}
-                                                className="py-1.5"
-                                                active={link.active}
+                                            <Link
+                                                to={link.path}
+                                                className="block py-1.5 w-full text-sm hover:text-primary"
                                             >
                                                 {link.label}
-                                            </NavigationMenuLink>
+                                            </Link>
                                         </NavigationMenuItem>
                                     ))}
                                 </NavigationMenuList>
@@ -82,23 +74,26 @@ export default function Component() {
                         </PopoverContent>
                     </Popover>
                     {/* Main nav */}
-                    <div className="flex items-center gap-6">
-                        <a href="/" className="text-primary hover:text-primary/90">
-                            <img src={logo} alt="Logo" className="h-8 w-auto" />
-                        </a>
+                    <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
+                        <Link to="/" className={scrolled ? "text-white hover:text-blue-100" : "text-primary hover:text-primary/90"}>
+                            <img src={logo} alt="Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
+                        </Link>
 
                         {/* Navigation menu */}
-                        <NavigationMenu className="max-md:hidden">
-                            <NavigationMenuList className="gap-2">
+                        <NavigationMenu className="max-sm:hidden">
+                            <NavigationMenuList className="gap-1 sm:gap-2 md:gap-3">
                                 {navigationLinks.map((link, index) => (
                                     <NavigationMenuItem key={index}>
-                                        <NavigationMenuLink
-                                            active={link.active}
-                                            href={link.href}
-                                            className="text-muted-foreground hover:text-primary py-1.5 font-medium"
+                                        <Link
+                                            to={link.path}
+                                            className={`py-1 sm:py-1.5 px-2 sm:px-3 text-sm sm:text-base font-medium inline-block ${
+                                                scrolled
+                                                    ? "text-white hover:text-blue-100"
+                                                    : "text-muted-foreground hover:text-primary"
+                                            }`}
                                         >
                                             {link.label}
-                                        </NavigationMenuLink>
+                                        </Link>
                                     </NavigationMenuItem>
                                 ))}
                             </NavigationMenuList>
@@ -107,12 +102,7 @@ export default function Component() {
                 </div>
                 {/* Right side */}
                 <div className="flex items-center gap-2">
-                    <Button asChild variant="ghost" size="sm" className="text-sm">
-                        <a href="#">Sign In</a>
-                    </Button>
-                    <Button asChild size="sm" className="text-sm">
-                        <a href="#">Get Started</a>
-                    </Button>
+                    <User className={`w-3 h-3 sm:w-4 sm:h-4 ${scrolled ? "text-white" : "text-muted-foreground"}`} />
                 </div>
             </div>
         </header>
