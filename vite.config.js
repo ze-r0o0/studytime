@@ -12,5 +12,5 @@ export default defineConfig({
             "@": resolve("src"),
         },
     },
-    base: './studytime/',
+    base: '/studytime/',
 });
