@@ -92,7 +92,7 @@ export default function Home() {
 
                     <div className="mt-12 text-center">
                         <p className="font-medium">Adviser</p>
-                        <p>Amy Balcita</p>
+                        <p>Amy</p>
                     </div>
                 </div>
                 <footer className="w-full mt-16">
