@@ -6,19 +6,27 @@ import {
 } from "@/components/ui/accordion"
 import logo from "@/assets/logo.svg";
 import playstore from "@/assets/playstore.png";
+import {Link} from "react-router-dom";
 
 export default function Home() {
     return (
-        <div className="flex flex-col items-center justify-center">
-            <div className="flex flex-col items-center justify-center min-h-[70vh]">
-                <blockquote className="text-3xl md:text-4xl font-semibold italic text-center max-w-2xl mb-4">
+        <div className="pt-150"> {/* push content below navbar */}
+            {/* Hero Section */}
+            <div className="flex flex-col items-center justify-center min-h-[70vh] pt-100">
+                <blockquote className="text-3xl md:text-4xl font-semibold italic text-center max-w-2xl mb-4 text-black">
                     "The best way to predict the future is to create it."
                 </blockquote>
                 <div className="text-gray-500 mb-8">— Abraham Lincoln</div>
-                <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-full px-8 py-2 transition-colors mb-16">
-                    Start Planning
-                </button>
+                <Link to={"/StudyPlanner"}>
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-full px-8 py-2 transition-colors mb-16">
+                        Start Planning
+                    </button>
+                </Link>
+                
             </div>
+
+
+            
 
             <div className="flex flex-col items-center justify-center mt-16 pt-16">
                 <blockquote className="text-3xl md:text-4xl font-semibold italic text-center max-w-2xl mb-4">
@@ -33,7 +41,6 @@ export default function Home() {
                     type="single"
                     collapsible
                     className="w-full max-w-2xl"
-                    defaultValue="item-1"
                 >
                     <AccordionItem value="item-1" className="border-b border-gray-200 dark:border-gray-700">
                         <AccordionTrigger className="py-4 text-base md:text-lg font-medium">Why was this planner created?</AccordionTrigger>

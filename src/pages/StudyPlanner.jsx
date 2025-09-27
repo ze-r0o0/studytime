@@ -1,3 +1,3 @@
 export default function StudyPlanner() {
-    return <h1>SSS</h1>;
+    return <h1>Study Planner</h1>;
 }

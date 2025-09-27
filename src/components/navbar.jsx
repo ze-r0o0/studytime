@@ -22,7 +22,7 @@ const navigationLinks = [
 ];
 
 export default function Component() {
-    const [scrolled, setScrolled] = useState(false);
+    const [, setScrolled] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -35,11 +35,7 @@ export default function Component() {
     }, []);
 
     return (
-        <header className={`fixed top-0 left-0 w-full z-50 border-b px-2 sm:px-4 md:px-6 lg:px-8 transition-colors duration-300 ${
-            scrolled
-                ? "bg-blue-500 text-white border-blue-600"
-                : "bg-white dark:bg-background"
-        }`}>
+        <header className="fixed top-0 left-0 w-full z-50 border-b px-2 sm:px-4 md:px-6 lg:px-8 transition-colors duration-300 bg-white dark:bg-background">
             <div className="flex h-14 sm:h-16 items-center justify-between gap-2 sm:gap-4">
                 {/* Left side */}
                 <div className="flex items-center gap-1 sm:gap-2">
@@ -47,9 +43,7 @@ export default function Component() {
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
-                                className={`group size-7 sm:size-8 sm:hidden ${
-                                    scrolled ? "text-white hover:bg-blue-600" : ""
-                                }`}
+                                className="group size-7 sm:size-8 sm:hidden"
                                 variant="ghost"
                                 size="icon"
                             >
@@ -75,7 +69,7 @@ export default function Component() {
                     </Popover>
                     {/* Main nav */}
                     <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
-                        <Link to="/" className={scrolled ? "text-white hover:text-blue-100" : "text-primary hover:text-primary/90"}>
+                        <Link to="/" className="text-primary hover:text-primary/90">
                             <img src={logo} alt="Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
                         </Link>
 
@@ -86,11 +80,7 @@ export default function Component() {
                                     <NavigationMenuItem key={index}>
                                         <Link
                                             to={link.path}
-                                            className={`py-1 sm:py-1.5 px-2 sm:px-3 text-sm sm:text-base font-medium inline-block ${
-                                                scrolled
-                                                    ? "text-white hover:text-blue-100"
-                                                    : "text-muted-foreground hover:text-primary"
-                                            }`}
+                                            className="py-1 sm:py-1.5 px-2 sm:px-3 text-sm sm:text-base font-medium inline-block text-muted-foreground hover:text-primary"
                                         >
                                             {link.label}
                                         </Link>
@@ -101,9 +91,10 @@ export default function Component() {
                     </div>
                 </div>
                 {/* Right side */}
-                <div className="flex items-center gap-2">
-                    <User className={`w-3 h-3 sm:w-4 sm:h-4 ${scrolled ? "text-white" : "text-muted-foreground"}`} />
+                <div className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100">
+                    <User className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
                 </div>
+
             </div>
         </header>
     )
