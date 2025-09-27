@@ -11,7 +11,7 @@ export default function App() {
     return (
         <>
             <Navbar />
-            <div className="pt-16">{/* Adjust pt-16 based on your navbar height */}
+            <div className="pt-16 min-h-screen w-full bg-background dark:bg-[#151a23]">{/* Adjust pt-16 based on your navbar height */}
                 <Routes>
                     <Route path="/" element={<Navigate to="/Home" replace />} />
                     <Route path="/Home" element={<Home />} />

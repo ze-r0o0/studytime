@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import logo from "@/assets/logo.svg";
-import { User, Menu } from 'lucide-react';
+import { UserRound, Menu } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
     NavigationMenu,
@@ -92,7 +92,7 @@ export default function Component() {
                 </div>
                 {/* Right side */}
                 <div className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100">
-                    <User className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
+                    <UserRound className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
                 </div>
 
             </div>
