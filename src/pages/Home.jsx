@@ -80,13 +80,13 @@ export default function Home() {
                     <h2 className="text-2xl font-bold mb-8">Team Members</h2>
                     <div className="grid grid-cols-2 gap-x-40 text-center md:text-left">
                         <div className="space-y-5">
-                            <p>Mapanao, Jan Emmerson</p>
-                            <p>Escanilla, Mark Fermin</p>
+                            <p>Map</p>
+                            <p>Esc</p>
                         </div>
 
                         <div className="space-y-5 text-right md:text-left">
-                            <p>Ferrer, Alex</p>
-                            <p>Milana, Elaiza Praise Milana</p>
+                            <p>Fer</p>
+                            <p>Mil</p>
                         </div>
                     </div>
 
