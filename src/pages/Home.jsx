@@ -8,6 +8,7 @@ import logo from "@/assets/logo.svg";
 import playstore from "@/assets/playstore.png";
 import {Link} from "react-router-dom";
 
+
 export default function Home() {
     return (
         <div className="min-h-screen w-full bg-background text-foreground pt-150">
