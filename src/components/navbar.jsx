@@ -23,6 +23,7 @@ const navigationLinks = [
 
 export default function Component() {
     const [, setScrolled] = useState(false);
+    const [profilePicture, setProfilePicture] = useState(null);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -32,6 +33,28 @@ export default function Component() {
 
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    // Load profile picture from localStorage
+    useEffect(() => {
+        const loadProfilePicture = () => {
+            const preview = localStorage.getItem("preview");
+            const selectedAvatar = localStorage.getItem("selectedAvatar");
+            setProfilePicture(preview || selectedAvatar || null);
+        };
+
+        loadProfilePicture();
+
+        // Listen for storage changes (when profile is updated in Settings)
+        window.addEventListener("storage", loadProfilePicture);
+
+        // Custom event for same-tab updates
+        window.addEventListener("profileUpdated", loadProfilePicture);
+
+        return () => {
+            window.removeEventListener("storage", loadProfilePicture);
+            window.removeEventListener("profileUpdated", loadProfilePicture);
+        };
     }, []);
 
     return (
@@ -91,10 +114,17 @@ export default function Component() {
                     </div>
                 </div>
                 {/* Right side */}
-                <div className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100">
-                    <UserRound className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
+                <div className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100 overflow-hidden">
+                    {profilePicture ? (
+                        <img
+                            src={profilePicture}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <UserRound className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
+                    )}
                 </div>
-
             </div>
         </header>
     )

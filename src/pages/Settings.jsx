@@ -13,16 +13,29 @@ import toast, { Toaster } from 'react-hot-toast';
 export default function Settings() {
     const [editProfileOpen, setEditProfileOpen] = useState(false);
     const [photoModalOpen, setPhotoModalOpen] = useState(false);
-    const [selectedAvatar, setSelectedAvatar] = useState(null);
-    const [preview, setPreview] = useState(null);
+    const [selectedAvatar, setSelectedAvatar] = useState(() => {
+        const saved = localStorage.getItem("selectedAvatar");
+        return saved || null;
+    });
+    const [preview, setPreview] = useState(() => {
+        const saved = localStorage.getItem("preview");
+        return saved || null;
+    });
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
-    // Form data state (to store form changes)
-    const [formData, setFormData] = useState({
-        fullName: "Aldrin Villanueva",
-        email: "aldrinvil@gmail.com",
-        bio: "Student passionate about learning and productivity. Currently studying Computer Science and exploring new study techniques."
+    // Temporary avatar states for editing
+    const [tempSelectedAvatar, setTempSelectedAvatar] = useState(null);
+    const [tempPreview, setTempPreview] = useState(null);
+
+    // Load form data from localStorage on mount
+    const [formData, setFormData] = useState(() => {
+        const saved = localStorage.getItem("profileFormData");
+        return saved ? JSON.parse(saved) : {
+            fullName: "Aldrin Villanueva",
+            email: "aldrinvil@gmail.com",
+            bio: "Student passionate about learning and productivity. Currently studying Computer Science and exploring new study techniques."
+        };
     });
 
     const openPhotoModal = () => {
@@ -30,9 +43,10 @@ export default function Settings() {
     };
 
     const handleSavePhoto = () => {
+        // Just close modal and show selection confirmation
         setPhotoModalOpen(false);
-        // Show toast notification when photo is saved
-        toast.success('Profile picture updated!', {
+
+        toast.success('Avatar selected!', {
             icon: <Check className="w-5 h-5" />,
             duration: 2000,
             style: {
@@ -46,10 +60,23 @@ export default function Settings() {
     // Function to handle saving profile changes
     const handleSaveProfile = () => {
         console.log("Profile saved:", formData);
-        setEditProfileOpen(false);
-        setIsSaveModalOpen(false); // <-- close the confirmation modal
 
-        // Show toast notification when profile is saved
+        // Save form data to localStorage
+        localStorage.setItem("profileFormData", JSON.stringify(formData));
+
+        // Save avatar data to localStorage
+        localStorage.setItem("selectedAvatar", tempSelectedAvatar || "");
+        localStorage.setItem("preview", tempPreview || "");
+
+        // Update main state
+        setSelectedAvatar(tempSelectedAvatar);
+        setPreview(tempPreview);
+
+        window.dispatchEvent(new Event("profileUpdated"));
+
+        setEditProfileOpen(false);
+        setIsSaveModalOpen(false);
+
         toast.success('Profile updated successfully!', {
             icon: <Check className="w-5 h-5" />,
             duration: 2000,
@@ -59,6 +86,13 @@ export default function Settings() {
                 color: '#fff',
             },
         });
+    };
+
+    const handleEditProfileOpen = () => {
+        // Initialize temp states with current values
+        setTempSelectedAvatar(selectedAvatar);
+        setTempPreview(preview);
+        setEditProfileOpen(true);
     };
 
     return (
@@ -107,14 +141,13 @@ export default function Settings() {
                                     <UserRound className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500" />
                                 )}
                             </div>
-                            {/* Camera icon removed from main profile view as requested */}
                         </div>
                         <div className="flex flex-col">
                             <span className="text-base sm:text-lg font-semibold mb-2">
                                 {formData.fullName}
                             </span>
                             <button
-                                onClick={() => setEditProfileOpen(true)}
+                                onClick={handleEditProfileOpen}
                                 className="bg-white border-2 border-blue-500 hover:bg-blue-600 hover:text-white text-blue-600 font-medium rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base transition-colors"
                             >
                                 Edit Profile
@@ -201,8 +234,8 @@ export default function Settings() {
                 <EditProfileModal
                     onClose={() => setEditProfileOpen(false)}
                     openPhotoModal={openPhotoModal}
-                    preview={preview}
-                    selectedAvatar={selectedAvatar}
+                    preview={tempPreview}
+                    selectedAvatar={tempSelectedAvatar}
                     formData={formData}
                     setFormData={setFormData}
                     onSaveClick={() => setIsSaveModalOpen(true)}
@@ -212,14 +245,13 @@ export default function Settings() {
             {photoModalOpen && (
                 <PhotoProfileModal
                     onClose={() => setPhotoModalOpen(false)}
-                    setSelectedAvatar={setSelectedAvatar}
-                    setPreview={setPreview}
-                    selectedAvatar={selectedAvatar}
-                    preview={preview}
+                    setSelectedAvatar={setTempSelectedAvatar}
+                    setPreview={setTempPreview}
+                    selectedAvatar={tempSelectedAvatar}
+                    preview={tempPreview}
                     onSave={handleSavePhoto}
                     returnToEditProfile={() => {
                         setPhotoModalOpen(false);
-                        // Re-open edit profile modal after saving photo
                         setTimeout(() => setEditProfileOpen(true), 100);
                     }}
                 />
@@ -238,7 +270,6 @@ export default function Settings() {
                 isOpen={isRemoveModalOpen}
                 onClose={() => setIsRemoveModalOpen(false)}
                 onConfirm={() => {
-                    // Handle removal logic here
                     setIsRemoveModalOpen(false);
                 }}
                 subject="profile"
@@ -248,10 +279,8 @@ export default function Settings() {
 }
 
 function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, formData, setFormData, onSaveClick }) {
-    // Local state to track form changes
     const [localFormData, setLocalFormData] = useState({...formData});
 
-    // Handle input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setLocalFormData({
@@ -260,11 +289,8 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
         });
     };
 
-    // Handle save button click
     const handleSave = () => {
-        // Update parent form data
         setFormData(localFormData);
-        // Open confirmation modal
         onSaveClick();
     };
 
@@ -278,7 +304,6 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                     </button>
                 </div>
                 <div className="flex items-start mb-6">
-                    {/* Profile Icon + Camera */}
                     <div className="relative">
                         <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
                             {preview ? (
@@ -297,7 +322,6 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                                 <UserRound className="w-10 h-10 text-blue-500" />
                             )}
                         </div>
-                        {/* Camera icon shown only in edit profile mode */}
                         <button
                             onClick={openPhotoModal}
                             className="absolute bottom-0 right-0 bg-blue-500 border border-white rounded-full p-1 cursor-pointer"
@@ -305,7 +329,6 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                             <Camera className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                         </button>
                     </div>
-                    {/* Text beside it */}
                     <div className="ml-4 flex flex-col text-left">
                         <span className="font-bold text-sm text-gray-500">Profile Photo</span>
                         <span className="text-sm text-gray-500">Click the camera icon to update</span>
@@ -367,16 +390,12 @@ function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, pre
         const file = e.target.files[0];
         if (file) {
             setPreview(URL.createObjectURL(file));
-            setSelectedAvatar(null); // Clear selected avatar when uploading a custom image
+            setSelectedAvatar(null);
         }
     };
 
-    // Modified save handler to return to edit profile
     const handleSaveAndReturn = () => {
-        // First save the photo changes
         onSave();
-
-        // Then return to edit profile
         returnToEditProfile();
     };
 
@@ -390,7 +409,6 @@ function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, pre
                     </button>
                 </div>
 
-                {/* Stock Avatars */}
                 <div className="text-left mb-4">
                     <div className="flex justify-between mb-2">
                         <p className="font-semibold text-sm">Stock Avatars</p>
@@ -430,7 +448,6 @@ function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, pre
                     </div>
                 </div>
 
-                {/* Upload */}
                 <div className="mb-4 text-left">
                     <p className="font-semibold text-sm mb-2">Upload Your Own</p>
                     <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
@@ -444,7 +461,6 @@ function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, pre
                     </div>
                 </div>
 
-                {/* Preview */}
                 <div className="text-left mb-4">
                     <p className="font-semibold text-sm mb-2">Preview</p>
                     <div className="flex justify-center">
@@ -468,7 +484,6 @@ function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, pre
                     </div>
                 </div>
 
-                {/* Buttons */}
                 <div className="flex justify-end gap-2 mt-6">
                     <button
                         onClick={returnToEditProfile}

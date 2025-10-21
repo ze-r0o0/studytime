@@ -25,25 +25,22 @@ const subjectOptions = [
 ];
 
 export default function TaskList() {
-    const [tasks, setTasks] = useState([]);
+    // Load tasks from localStorage on initialization
+    const [tasks, setTasks] = useState(() => {
+        const storedTasks = localStorage.getItem("tasks");
+        return storedTasks ? JSON.parse(storedTasks) : [];
+    });
+
     const [newTask, setNewTask] = useState("");
     const [selectedSubject, setSelectedSubject] = useState("");
     const [dueDate, setDueDate] = useState(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
     const [searchTerm, setSearchTerm] = useState("");
     const [filterSubject, setFilterSubject] = useState("");
-    const [activeTab, setActiveTab] = useState("1"); // Default to "ALL" tab
+    const [activeTab, setActiveTab] = useState("1");
 
     // Modal states
     const [removeModalOpen, setRemoveModalOpen] = useState(false);
     const [taskToRemove, setTaskToRemove] = useState(null);
-
-    // Load tasks from localStorage on component mount
-    useEffect(() => {
-        const storedTasks = localStorage.getItem("tasks");
-        if (storedTasks) {
-            setTasks(JSON.parse(storedTasks));
-        }
-    }, []);
 
     // Save tasks to localStorage whenever tasks change
     useEffect(() => {
@@ -52,7 +49,6 @@ export default function TaskList() {
 
     // Function to add a new task
     const addTask = () => {
-        // Validate task title
         if (newTask.trim() === "") {
             toast.error('Please enter a task title', {
                 icon: <AlertTriangle className="w-5 h-5" />,
@@ -61,7 +57,6 @@ export default function TaskList() {
             return;
         }
 
-        // Validate subject selection (optional validation)
         if (selectedSubject.trim() === "") {
             toast.error('Please select a subject', {
                 icon: <AlertTriangle className="w-5 h-5" />,
@@ -81,55 +76,42 @@ export default function TaskList() {
 
         setTasks([...tasks, newTaskItem]);
 
-        // Show success toast
         toast.success(`Task added: ${newTask}`, {
             icon: <Check className="w-5 h-5" />,
             duration: 2000,
         });
 
-        // Clear input field after adding
         setNewTask("");
     };
 
-    // Function to prompt before deleting a task
     const promptDeleteTask = (task) => {
         setTaskToRemove(task);
         setRemoveModalOpen(true);
     };
 
-    // Function to actually delete the task
     const confirmDeleteTask = () => {
         if (!taskToRemove) return;
 
-        // Store the task title before removing the task
         const removedTaskTitle = taskToRemove.title;
-
-        // Remove the task
         setTasks(tasks.filter(task => task.id !== taskToRemove.id));
-
-        // Close modal and clear taskToRemove
         setRemoveModalOpen(false);
 
-        // Show removal notification with toast
         toast.success(`Task removed: ${removedTaskTitle}`, {
             icon: <Trash2 className="w-5 h-5" />,
             duration: 2000,
             style: {
-                borderLeft: '4px solid #ef4444', // Red color for removal
+                borderLeft: '4px solid #ef4444',
             },
         });
 
-        // Clear the taskToRemove state
         setTaskToRemove(null);
     };
 
-    // Function to toggle task completion
     const toggleTaskComplete = (taskId) => {
         setTasks(tasks.map(task => {
             if (task.id === taskId) {
                 const newCompletedState = !task.completed;
 
-                // Show toast based on the new completed state
                 if (newCompletedState) {
                     toast.success(`Task completed: ${task.title}`, {
                         icon: <Check className="w-5 h-5" />,
@@ -143,7 +125,6 @@ export default function TaskList() {
         }));
     };
 
-    // Filter tasks based on search term and filter subject
     const filteredTasks = tasks.filter(task => {
         const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             task.subject.toLowerCase().includes(searchTerm.toLowerCase());
@@ -151,7 +132,6 @@ export default function TaskList() {
         return matchesSearch && matchesSubject;
     });
 
-    // Group tasks by date categories
     const allTasks = filteredTasks;
     const noDateTasks = filteredTasks.filter(task => !task.dueDate);
     const todayTasks = filteredTasks.filter(task => task.dueDate && isToday(parseISO(task.dueDate)));
@@ -173,14 +153,12 @@ export default function TaskList() {
         return taskDate > twoWeeksLater;
     });
 
-    // Format date for display
     const formatTaskDate = (dateString) => {
         if (!dateString) return "";
         const date = parseISO(dateString);
         return format(date, "MMM dd, yyyy h:mm a");
     };
 
-    // Calculate due status
     const getDueStatus = (dateString) => {
         if (!dateString) return null;
         const date = parseISO(dateString);
@@ -201,7 +179,6 @@ export default function TaskList() {
         return { text: `Due in ${daysUntil} days`, className: "text-gray-500" };
     };
 
-    // Render task items for a given list
     const renderTaskItems = (taskList) => {
         return taskList.map(task => (
             <div key={task.id} className="border-b py-3 px-1 flex items-center gap-2">
@@ -248,7 +225,6 @@ export default function TaskList() {
 
     return (
         <div className="w-full max-w-4xl mx-auto mt-8 px-4">
-            {/* Toast container */}
             <Toaster
                 position="bottom-right"
                 toastOptions={{
@@ -268,7 +244,6 @@ export default function TaskList() {
 
             <div className="border rounded-lg p-4 shadow-sm bg-background">
                 <div className="flex flex-row items-center justify-between gap-3">
-                    {/* Subject dropdown */}
                     <div className="flex flex-col min-w-[120px]">
                         <label className="text-sm font-medium mb-1 text-left">Subject</label>
                         <select
@@ -282,7 +257,6 @@ export default function TaskList() {
                             ))}
                         </select>
                     </div>
-                    {/* Date & Time */}
                     <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 gap-2">
                         <Calendar className="w-4 h-4 text-gray-500" />
                         <input
@@ -294,7 +268,6 @@ export default function TaskList() {
                     </div>
                 </div>
                 <div className="flex flex-row items-center gap-3 pt-3">
-                    {/* Task input */}
                     <input
                         type="text"
                         placeholder="Add a new task..."
@@ -306,7 +279,6 @@ export default function TaskList() {
                         className="flex-1 border border-gray-200 bg-gray-50 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
 
-                    {/* Add Task button */}
                     <button
                         onClick={addTask}
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md px-4 py-2 transition"
@@ -345,7 +317,6 @@ export default function TaskList() {
                 </label>
             </div>
 
-            {/* Accordion Section */}
             <div className="w-full mt-8">
                 <Accordion
                     type="single"
@@ -464,7 +435,6 @@ export default function TaskList() {
                 </Accordion>
             </div>
 
-            {/* Remove Confirmation Modal using your imported component */}
             <RemoveConfirmModal
                 isOpen={removeModalOpen}
                 onClose={() => setRemoveModalOpen(false)}

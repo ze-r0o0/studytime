@@ -14,8 +14,8 @@ export default function Home() {
         <div className="min-h-screen w-full bg-background text-foreground pt-150">
             <div className="mx-auto max-w-4xl">
                 {/* Hero Section */}
-                <div className="flex flex-col items-center justify-center min-h-[70vh] pt-100">
-                    <blockquote className="text-3xl md:text-4xl font-semibold italic text-center max-w-2xl mb-4 text-black">
+                <div className="flex flex-col items-center justify-center min-h-[70vh] pt-100 px-4">
+                    <blockquote className="text-3xl md:text-4xl font-semibold italic text-center mb-4 text-black">
                         "The best way to predict the future is to create it."
                     </blockquote>
                     <div className="text-gray-500 mb-8">— Abraham Lincoln</div>
@@ -24,21 +24,16 @@ export default function Home() {
                             Start Planning
                         </button>
                     </Link>
-                    
                 </div>
 
-
-                
-
-                <div className="flex flex-col items-center justify-center mt-16 pt-16 w-full">
-                    <blockquote className="text-3xl md:text-4xl font-semibold italic text-center max-w-2xl mb-4">
+                <div className="flex flex-col items-center justify-center mt-16 pt-16 w-full px-4">
+                    <blockquote className="text-3xl md:text-4xl font-semibold italic text-center mb-4">
                         Frequently Asked Questions
                     </blockquote>
                 </div>
 
                 {/*Accordion Section*/}
-
-                <div className="flex flex-col items-center justify-center w-full px-4 md:px-0">
+                <div className="flex flex-col items-center justify-center w-full px-4">
                     <Accordion
                         type="single"
                         collapsible
@@ -54,7 +49,6 @@ export default function Home() {
                                 </p>
                             </AccordionContent>
                         </AccordionItem>
-                        {/* Other accordion items with the same class additions */}
                         <AccordionItem value="item-2" className="border-b border-gray-200 dark:border-gray-700">
                             <AccordionTrigger className="py-4 text-base md:text-lg font-medium">Who is the planner for?</AccordionTrigger>
                             <AccordionContent className="flex flex-col gap-4 text-balance">
@@ -77,6 +71,7 @@ export default function Home() {
                         </AccordionItem>
                     </Accordion>
                 </div>
+
                 <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 w-full">
                     <h2 className="text-2xl font-bold mb-8">Team Members</h2>
                     <div className="grid grid-cols-2 gap-x-40 text-center md:text-left">
@@ -84,22 +79,20 @@ export default function Home() {
                             <p>Map</p>
                             <p>Esc</p>
                         </div>
-
                         <div className="space-y-5 text-right md:text-left">
                             <p>Fer</p>
                             <p>Mil</p>
                         </div>
                     </div>
-
                     <div className="mt-12 text-center">
                         <p className="font-medium">Adviser</p>
                         <p>Amy</p>
                     </div>
                 </div>
-                <footer className="w-full mt-16">
-                    <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start justify-between px-6 py-6">
 
-                        {/* Left side */}
+                {/* Footer*/}
+                <footer className="w-full mt-16">
+                    <div className="flex flex-col md:flex-row items-start justify-between px-6 py-6">
                         <div className="flex gap-4">
                             <img
                                 src={logo}
@@ -110,8 +103,6 @@ export default function Home() {
                                 Study Time: A Web-Based Study Planner for Managing Time and Tasks
                             </p>
                         </div>
-
-                        {/* Right side */}
                         <div className="mt-4 md:mt-0">
                             <a href="#">
                                 <img
@@ -122,11 +113,9 @@ export default function Home() {
                             </a>
                         </div>
                     </div>
-
-                    {/* Bottom row */}
                     <div className="border-t flex justify-between items-center px-6 py-4 text-xs text-gray-500">
                         <p>© 2024 BSCS 3-1B. All rights reserved.</p>
-                        <p>Study Time™ </p>
+                        <p>Study Time™</p>
                     </div>
                 </footer>
             </div>
