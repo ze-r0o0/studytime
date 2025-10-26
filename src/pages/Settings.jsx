@@ -10,25 +10,41 @@ import stockavatar4 from "@/assets/stockavatar4.jpg";
 import {RemoveConfirmModal, SaveConfirmModal} from "../components/ui/ConfirmModals.jsx";
 import toast, { Toaster } from 'react-hot-toast';
 
+/*
+  Settings.jsx
+  - User profile settings page with edit capabilities.
+  - Features: edit profile (name, email, bio), change profile picture (stock avatars or upload custom), theme toggle.
+  - All changes persist to localStorage and trigger a "profileUpdated" event for other components.
+  - Uses modals for edit profile, choose photo, and save confirmation.
+*/
+
 export default function Settings() {
+    // State: edit profile modal visibility
     const [editProfileOpen, setEditProfileOpen] = useState(false);
+    // State: photo selection modal visibility
     const [photoModalOpen, setPhotoModalOpen] = useState(false);
+
+    // State: selected avatar (stock image URL or null) - loaded from localStorage on mount
     const [selectedAvatar, setSelectedAvatar] = useState(() => {
         const saved = localStorage.getItem("selectedAvatar");
         return saved || null;
     });
+
+    // State: custom uploaded photo preview (base64 or blob URL) - loaded from localStorage on mount
     const [preview, setPreview] = useState(() => {
         const saved = localStorage.getItem("preview");
         return saved || null;
     });
+
+    // State: confirmation modal states
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
-    // Temporary avatar states for editing
+    // State: temporary avatar states used only while editing (not saved until user confirms)
     const [tempSelectedAvatar, setTempSelectedAvatar] = useState(null);
     const [tempPreview, setTempPreview] = useState(null);
 
-    // Load form data from localStorage on mount
+    // State: form data (full name, email, bio) - loaded from localStorage on mount or defaults
     const [formData, setFormData] = useState(() => {
         const saved = localStorage.getItem("profileFormData");
         return saved ? JSON.parse(saved) : {
@@ -38,12 +54,13 @@ export default function Settings() {
         };
     });
 
+    // Function: open photo selection modal (sets edit mode)
     const openPhotoModal = () => {
         setPhotoModalOpen(true);
     };
 
+    // Function: handle photo save (close modal and show confirmation toast)
     const handleSavePhoto = () => {
-        // Just close modal and show selection confirmation
         setPhotoModalOpen(false);
 
         toast.success('Avatar selected!', {
@@ -57,26 +74,29 @@ export default function Settings() {
         });
     };
 
-    // Function to handle saving profile changes
+    // Function: handle profile save (persist to localStorage, close modals, dispatch event, show toast)
     const handleSaveProfile = () => {
         console.log("Profile saved:", formData);
 
-        // Save form data to localStorage
+        // Persist form data to localStorage
         localStorage.setItem("profileFormData", JSON.stringify(formData));
 
-        // Save avatar data to localStorage
+        // Persist avatar data to localStorage (empty string if null)
         localStorage.setItem("selectedAvatar", tempSelectedAvatar || "");
         localStorage.setItem("preview", tempPreview || "");
 
-        // Update main state
+        // Update main state with temp values (commit changes)
         setSelectedAvatar(tempSelectedAvatar);
         setPreview(tempPreview);
 
+        // Dispatch custom event so other components (e.g., navbar) can update
         window.dispatchEvent(new Event("profileUpdated"));
 
+        // Close modals
         setEditProfileOpen(false);
         setIsSaveModalOpen(false);
 
+        // Show success toast
         toast.success('Profile updated successfully!', {
             icon: <Check className="w-5 h-5" />,
             duration: 2000,
@@ -88,8 +108,8 @@ export default function Settings() {
         });
     };
 
+    // Function: open edit profile modal and initialize temp states with current values
     const handleEditProfileOpen = () => {
-        // Initialize temp states with current values
         setTempSelectedAvatar(selectedAvatar);
         setTempPreview(preview);
         setEditProfileOpen(true);
@@ -97,7 +117,7 @@ export default function Settings() {
 
     return (
         <div className="min-h-screen bg-background text-foreground pt-80 md:pt-[500px] px-4 pb-8 overflow-auto">
-            {/* Toast container */}
+            {/* Toast notification container (bottom-right) */}
             <Toaster
                 position="bottom-right"
                 toastOptions={{
@@ -114,6 +134,7 @@ export default function Settings() {
 
             <div className="mx-auto max-w-4xl w-full">
                 <div className="flex flex-col min-h-[70vh] w-full">
+                    {/* Page title and subtitle */}
                     <label className="text-4xl sm:text-2xl font-semibold text-left mb-2">
                         Profile Information
                     </label>
@@ -121,9 +142,10 @@ export default function Settings() {
                         Manage your personal details and profile picture.
                     </p>
 
-                    {/* Profile Section */}
+                    {/* Profile Section: avatar + name + edit button */}
                     <div className="flex items-start gap-x-3 sm:gap-x-4 mb-8">
                         <div className="relative">
+                            {/* Profile avatar (displays preview, selectedAvatar, or default icon) */}
                             <div className="w-16 h-16 sm:w-26 sm:h-26 flex items-center justify-center rounded-full bg-blue-100 flex-shrink-0 overflow-hidden">
                                 {preview ? (
                                     <img
@@ -143,9 +165,11 @@ export default function Settings() {
                             </div>
                         </div>
                         <div className="flex flex-col">
+                            {/* Display user's full name */}
                             <span className="text-base sm:text-lg font-semibold mb-2">
                                 {formData.fullName}
                             </span>
+                            {/* Edit profile button: opens edit modal */}
                             <button
                                 onClick={handleEditProfileOpen}
                                 className="bg-white border-2 border-blue-500 hover:bg-blue-600 hover:text-white text-blue-600 font-medium rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base transition-colors"
@@ -155,7 +179,7 @@ export default function Settings() {
                         </div>
                     </div>
 
-                    {/* Full Name */}
+                    {/* Full Name field (read-only display) */}
                     <div className="flex items-center gap-x-2 mb-1">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
                             <UserRound className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
@@ -166,7 +190,7 @@ export default function Settings() {
                         {formData.fullName}
                     </p>
 
-                    {/* Email */}
+                    {/* Email field (read-only display) */}
                     <div className="flex items-center gap-x-2 mb-1">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
                             <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
@@ -177,7 +201,7 @@ export default function Settings() {
                         {formData.email}
                     </p>
 
-                    {/* Bio */}
+                    {/* Bio field (read-only display) */}
                     <div className="flex items-center gap-x-2 mb-1">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
                             <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
@@ -190,7 +214,7 @@ export default function Settings() {
 
                     <hr className="h-px my-6 sm:my-8 bg-gray-200 border-0 dark:bg-gray-700" />
 
-                    {/* Theme Settings */}
+                    {/* Theme Settings section */}
                     <div className="flex flex-col mb-4">
                         <h2 className="text-xl sm:text-2xl font-semibold text-left mb-2">
                             Theme Settings
@@ -200,6 +224,7 @@ export default function Settings() {
                         </p>
                     </div>
 
+                    {/* Dark mode toggle component */}
                     <div className="p-4 sm:p-6">
                         <DarkModeToggle initial={false} />
                     </div>
@@ -207,7 +232,7 @@ export default function Settings() {
                     <hr className="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700" />
                 </div>
 
-                {/* Footer */}
+                {/* Footer: logo, description, play store link, copyright */}
                 <footer className="w-full mt-16">
                     <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start justify-between px-6 py-6">
                         <div className="flex gap-4">
@@ -230,6 +255,7 @@ export default function Settings() {
                 </footer>
             </div>
 
+            {/* Edit Profile Modal: opened when user clicks "Edit Profile" */}
             {editProfileOpen && (
                 <EditProfileModal
                     onClose={() => setEditProfileOpen(false)}
@@ -242,6 +268,7 @@ export default function Settings() {
                 />
             )}
 
+            {/* Photo Selection Modal: opened from edit profile to choose avatar */}
             {photoModalOpen && (
                 <PhotoProfileModal
                     onClose={() => setPhotoModalOpen(false)}
@@ -257,7 +284,7 @@ export default function Settings() {
                 />
             )}
 
-            {/* Save Confirmation Modal */}
+            {/* Save Confirmation Modal: opened when user clicks "Save changes" in edit profile */}
             <SaveConfirmModal
                 isOpen={isSaveModalOpen}
                 onClose={() => setIsSaveModalOpen(false)}
@@ -265,7 +292,7 @@ export default function Settings() {
                 subject="profile"
             />
 
-            {/* Remove Confirmation Modal (if needed) */}
+            {/* Remove Confirmation Modal: placeholder (not currently used but kept for future) */}
             <RemoveConfirmModal
                 isOpen={isRemoveModalOpen}
                 onClose={() => setIsRemoveModalOpen(false)}
@@ -278,9 +305,17 @@ export default function Settings() {
     );
 }
 
+/*
+  EditProfileModal component
+  - Modal for editing profile details (name, email, bio) and changing avatar.
+  - Displays current avatar with camera icon to open photo picker.
+  - Changes are saved to local state until user confirms via "Save changes".
+*/
 function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, formData, setFormData, onSaveClick }) {
+    // Local state: temporary form data (changes not committed until save)
     const [localFormData, setLocalFormData] = useState({...formData});
 
+    // Handle input change: update local form data
     const handleChange = (e) => {
         const { name, value } = e.target;
         setLocalFormData({
@@ -289,6 +324,7 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
         });
     };
 
+    // Handle save: update parent form data and open confirmation modal
     const handleSave = () => {
         setFormData(localFormData);
         onSaveClick();
@@ -297,14 +333,18 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-60">
             <div className="bg-white rounded-lg w-[500px] shadow-lg p-6">
+                {/* Modal header */}
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold">Edit Profile</h2>
                     <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
                         ✕
                     </button>
                 </div>
+
+                {/* Avatar section with camera icon */}
                 <div className="flex items-start mb-6">
                     <div className="relative">
+                        {/* Display current avatar (preview, selectedAvatar, or default) */}
                         <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
                             {preview ? (
                                 <img
@@ -322,6 +362,7 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                                 <UserRound className="w-10 h-10 text-blue-500" />
                             )}
                         </div>
+                        {/* Camera icon button: opens photo selection modal */}
                         <button
                             onClick={openPhotoModal}
                             className="absolute bottom-0 right-0 bg-blue-500 border border-white rounded-full p-1 cursor-pointer"
@@ -329,11 +370,14 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                             <Camera className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                         </button>
                     </div>
+                    {/* Avatar hint text */}
                     <div className="ml-4 flex flex-col text-left">
                         <span className="font-bold text-sm text-gray-500">Profile Photo</span>
                         <span className="text-sm text-gray-500">Click the camera icon to update</span>
                     </div>
                 </div>
+
+                {/* Form fields: Full Name, Email, Bio */}
                 <div className="space-y-4 text-left">
                     <div>
                         <label className="block text-sm text-gray-600 mb-1">Full Name</label>
@@ -366,6 +410,8 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                         ></textarea>
                     </div>
                 </div>
+
+                {/* Action buttons: Cancel and Save */}
                 <div className="flex justify-end gap-2 mt-6">
                     <button
                         onClick={onClose}
@@ -385,15 +431,23 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
     );
 }
 
-function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, preview, onSave, returnToEditProfile }) {
+/*
+  PhotoProfileModal component
+  - Modal for choosing a profile picture (stock avatars, default icon, or upload custom).
+  - Shows preview of selected/uploaded image before saving.
+  - Returns to edit profile modal after saving.
+*/
+function PhotoProfileModal({ setSelectedAvatar, setPreview, selectedAvatar, preview, onSave, returnToEditProfile }) {
+    // Handle file upload: read file and set preview URL
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setPreview(URL.createObjectURL(file));
-            setSelectedAvatar(null);
+            setSelectedAvatar(null); // clear stock avatar when custom image is uploaded
         }
     };
 
+    // Handle save and return: save avatar selection and return to edit profile
     const handleSaveAndReturn = () => {
         onSave();
         returnToEditProfile();
@@ -402,6 +456,7 @@ function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, pre
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-70">
             <div className="bg-white rounded-lg w-[500px] shadow-lg p-6">
+                {/* Modal header */}
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold">Choose Profile Picture</h2>
                     <button onClick={returnToEditProfile} className="text-gray-500 hover:text-gray-700">
@@ -409,12 +464,14 @@ function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, pre
                     </button>
                 </div>
 
+                {/* Stock avatars section */}
                 <div className="text-left mb-4">
                     <div className="flex justify-between mb-2">
                         <p className="font-semibold text-sm">Stock Avatars</p>
                         <p className="font-semibold text-sm">Default Avatar</p>
                     </div>
 
+                    {/* Stock avatar images + default icon */}
                     <div className="flex gap-3">
                         {[stockavatar1, stockavatar2, stockavatar3, stockavatar4].map(
                             (avatar, i) => (
@@ -429,11 +486,12 @@ function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, pre
                                     }`}
                                     onClick={() => {
                                         setSelectedAvatar(avatar);
-                                        setPreview(null);
+                                        setPreview(null); // clear custom preview
                                     }}
                                 />
                             )
                         )}
+                        {/* Default avatar (UserRound icon) */}
                         <div
                             className={`w-18 h-18 rounded-full flex items-center justify-center bg-gray-100 cursor-pointer border-2 ${
                                 !selectedAvatar && !preview ? "border-blue-500" : "border-transparent"
@@ -448,12 +506,14 @@ function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, pre
                     </div>
                 </div>
 
+                {/* Upload custom image section */}
                 <div className="mb-4 text-left">
                     <p className="font-semibold text-sm mb-2">Upload Your Own</p>
                     <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                         <span className="text-sm text-gray-500 mb-2">
                             Choose photo from your device.
                         </span>
+                        {/* Hidden file input triggered by label */}
                         <label className="bg-blue-500 text-white text-sm px-4 py-1 rounded-md cursor-pointer">
                             Browse Files
                             <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
@@ -461,6 +521,7 @@ function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, pre
                     </div>
                 </div>
 
+                {/* Preview section: shows selected avatar or uploaded image */}
                 <div className="text-left mb-4">
                     <p className="font-semibold text-sm mb-2">Preview</p>
                     <div className="flex justify-center">
@@ -484,6 +545,7 @@ function PhotoProfileModal({  setSelectedAvatar, setPreview, selectedAvatar, pre
                     </div>
                 </div>
 
+                {/* Action buttons: Cancel and Save Picture */}
                 <div className="flex justify-end gap-2 mt-6">
                     <button
                         onClick={returnToEditProfile}

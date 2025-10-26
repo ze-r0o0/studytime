@@ -1,0 +1,271 @@
+.weekly-schedule-container {
+    padding: 32px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.schedule-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.week-navigation {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-button {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    color: #666;
+    transition: all 0.2s;
+}
+
+.nav-button:hover {
+    background: #f8f8f8;
+    border-color: #ccc;
+}
+
+.week-range {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    min-width: 100px;
+    text-align: center;
+}
+
+.edit-button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.edit-button:hover {
+    background: #2563eb;
+}
+
+/* Override react-big-calendar styles */
+.rbc-calendar {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Show borders and grid lines */
+.rbc-time-header-content {
+    border-left: 1px solid #e5e7eb;
+}
+
+.rbc-time-content {
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Header styling with borders */
+.rbc-header {
+    padding: 16px 8px;
+    font-weight: 600;
+    font-size: 15px;
+    color: #3b82f6;
+    background: white;
+    text-align: center;
+    border-bottom: 2px solid #e5e7eb;
+    border-left: 1px solid #e5e7eb;
+}
+
+.rbc-header:first-child {
+    border-left: none;
+}
+
+/* Time slots with visible lines */
+.rbc-time-slot {
+    min-height: 60px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.rbc-timeslot-group {
+    min-height: 60px;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Day slot borders */
+.rbc-day-slot .rbc-time-slot {
+    border-top: 1px solid #f3f4f6;
+}
+
+/* Vertical lines between days */
+.rbc-day-bg + .rbc-day-bg {
+    border-left: 1px solid #e5e7eb;
+}
+
+.rbc-time-column + .rbc-time-column {
+    border-left: 1px solid #e5e7eb;
+}
+
+/* Time gutter (left side time labels) */
+.rbc-time-gutter {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 400;
+    width: 60px;
+    background: white;
+}
+
+.rbc-label {
+    padding: 0 12px;
+    text-align: right;
+}
+
+.rbc-time-header-gutter {
+    width: 60px;
+    border-right: 1px solid #e5e7eb;
+    background: white;
+}
+
+/* Time content area */
+.rbc-time-content {
+    background: white;
+    border-left: 1px solid #e5e7eb;
+}
+
+.rbc-time-header {
+    background: white;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+/* Day columns */
+.rbc-time-column {
+    background: white;
+    min-width: 0;
+}
+
+/* Current time indicator */
+.rbc-current-time-indicator {
+    background-color: #3b82f6;
+    height: 2px;
+    left: 0;
+    right: 0;
+}
+
+/* Event styling */
+.rbc-event {
+    padding: 6px 10px;
+    border: none !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.rbc-event:hover {
+    opacity: 1 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.rbc-event-label {
+    display: none;
+}
+
+.rbc-event-content {
+    font-weight: 500;
+}
+
+/* Today highlight */
+.rbc-today {
+    background-color: #f8fafc;
+}
+
+/* Off range */
+.rbc-off-range-bg {
+    background: #fafafa;
+}
+
+/* Draggable cursor */
+.rbc-addons-dnd-draggable {
+    cursor: move;
+}
+
+.rbc-addons-dnd-dragging {
+    opacity: 0.6;
+}
+
+.rbc-addons-dnd-over {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* Calendar wrapper */
+.rbc-time-view {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.rbc-allday-cell {
+    display: none; /* Hide all-day section */
+}
+
+/* Fix header row alignment */
+.rbc-time-header-content {
+    border-left: none;
+    min-width: 0;
+}
+
+.rbc-row {
+    display: flex;
+}
+
+.rbc-header {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Time content layout */
+.rbc-time-content {
+    display: flex;
+    flex: 1;
+    align-items: flex-start;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.rbc-time-content > * + * {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Time gutter in content */
+.rbc-time-gutter.rbc-time-column {
+    border-right: 1px solid #e5e7eb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .schedule-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .week-navigation {
+        width: 100%;
+    }
+
+    .edit-button {
+        align-self: flex-end;
+    }
+}
