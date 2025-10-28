@@ -45,13 +45,13 @@ export default function Settings() {
     const [tempSelectedAvatar, setTempSelectedAvatar] = useState(null);
     const [tempPreview, setTempPreview] = useState(null);
 
-    // State: form data (full name, email, bio) - loaded from localStorage on mount or defaults
+    // State: form data (full name, email, bio) - loaded from localStorage on mount or defaults to empty
     const [formData, setFormData] = useState(() => {
         const saved = localStorage.getItem("profileFormData");
         return saved ? JSON.parse(saved) : {
-            fullName: "Aldrin Villanueva",
-            email: "aldrinvil@gmail.com",
-            bio: "Student passionate about learning and productivity. Currently studying Computer Science and exploring new study techniques."
+            fullName: "",
+            email: "",
+            bio: ""
         };
     });
 
@@ -117,7 +117,8 @@ export default function Settings() {
     };
 
     return (
-        <div className="min-h-screen bg-white pt-30 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 pb-8 overflow-auto">            {/* Toast notification container (bottom-right) */}
+        <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 pb-8 overflow-auto">
+            {/* Toast notification container (bottom-right) */}
             <Toaster
                 position="bottom-right"
                 toastOptions={{
@@ -165,9 +166,9 @@ export default function Settings() {
                             </div>
                         </div>
                         <div className="flex flex-col">
-                            {/* Display user's full name */}
+                            {/* Display user's full name or placeholder */}
                             <span className="text-base sm:text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
-                                {formData.fullName}
+                                {formData.fullName || "No name set"}
                             </span>
                             {/* Edit profile button: opens edit modal */}
                             <button
@@ -186,8 +187,8 @@ export default function Settings() {
                         </div>
                         <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Full Name</span>
                     </div>
-                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-4 text-left text-gray-900 dark:text-gray-100">
-                        {formData.fullName}
+                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-4 text-left text-gray-500 dark:text-gray-500 italic">
+                        {formData.fullName || "Not set"}
                     </p>
 
                     {/* Email field (read-only display) */}
@@ -197,8 +198,8 @@ export default function Settings() {
                         </div>
                         <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Email</span>
                     </div>
-                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-4 text-left text-gray-900 dark:text-gray-100">
-                        {formData.email}
+                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-4 text-left text-gray-500 dark:text-gray-500 italic">
+                        {formData.email || "Not set"}
                     </p>
 
                     {/* Bio field (read-only display) */}
@@ -208,8 +209,8 @@ export default function Settings() {
                         </div>
                         <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Bio</span>
                     </div>
-                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-8 text-left text-gray-900 dark:text-gray-100">
-                        {formData.bio}
+                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-8 text-left text-gray-500 dark:text-gray-500 italic">
+                        {formData.bio || "Not set"}
                     </p>
 
                     <hr className="h-px my-6 sm:my-8 bg-gray-200 border-0 dark:bg-gray-700" />
@@ -387,7 +388,8 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                             name="fullName"
                             value={localFormData.fullName}
                             onChange={handleChange}
-                            className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            placeholder="Enter your full name"
+                            className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                         />
                     </div>
                     <div>
@@ -397,7 +399,8 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                             name="email"
                             value={localFormData.email}
                             onChange={handleChange}
-                            className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            placeholder="Enter your email address"
+                            className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                         />
                     </div>
                     <div>
@@ -407,7 +410,8 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                             value={localFormData.bio}
                             onChange={handleChange}
                             rows="3"
-                            className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            placeholder="Tell us about yourself..."
+                            className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                         ></textarea>
                     </div>
                 </div>
