@@ -6,16 +6,16 @@ A modern, web-based study planner designed to help students manage their time an
 
 ## 📋 Table of Contents
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [Screenshots](#screenshots)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+- [Usage](#-usage)
+- [Project Structure](#-project-structure)
+- [Screenshots](#-screenshots)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Contact](#-contact)
 
 ## ✨ Features
 
@@ -86,5 +86,5 @@ A modern, web-based study planner designed to help students manage their time an
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/studytime.git
+git clone https://github.com/ze-r0o0/studytime.git
 cd studytime
