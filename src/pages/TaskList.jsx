@@ -299,10 +299,10 @@ export default function TaskList() {
                 />
 
                 {/* Main scrollable container */}
-                <div className="w-full max-w-4xl mx-auto px-4 py-8 pt-50">
+                <div className="w-full max-w-4xl mx-auto px-4 py-8 pt-30 ">
                     {/* Page title and subtitle */}
                     <h2 className="text-2xl font-semibold mb-2 text-left text-gray-900 dark:text-gray-100">Task List</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-left">Add Task</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-left">New Task</p>
 
                     {/* Add task form */}
                     <div className="border dark:border-gray-700 rounded-lg p-4 shadow-sm bg-white dark:bg-gray-800 mb-6">
@@ -361,7 +361,7 @@ export default function TaskList() {
                         <div className="flex flex-row items-center gap-3 pt-3">
                             <input
                                 type="text"
-                                placeholder="Add a new task..."
+                                placeholder="Type your task here…..."
                                 value={newTask}
                                 onChange={(e) => setNewTask(e.target.value)}
                                 onKeyDown={(e) => {
@@ -375,7 +375,7 @@ export default function TaskList() {
                                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md px-4 py-2 transition"
                             >
                                 <Plus className="w-4 h-4" />
-                                Add Task
+                                Add
                             </button>
                         </div>
                     </div>

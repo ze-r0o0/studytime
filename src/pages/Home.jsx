@@ -17,7 +17,7 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
     return (
-        <div className="min-h-screen w-full bg-background text-foreground pt-260">
+        <div className="min-h-screen w-full bg-background text-foreground">
             <div className="mx-auto max-w-4xl">
                 {/* Hero Section: inspirational quote + CTA button */}
                 <div className="flex flex-col items-center justify-center min-h-[70vh] pt-100 px-4">
@@ -186,7 +186,7 @@ export default function Home() {
                             </AccordionContent>
                         </AccordionItem>
                         {/* FAQ Item 11:What tool was used to design the app? */}
-                        <AccordionItem value="item-10" className="border-b border-gray-200 dark:border-gray-700">
+                        <AccordionItem value="item-11" className="border-b border-gray-200 dark:border-gray-700">
                             <AccordionTrigger className="py-4 text-base md:text-lg font-medium">
                                 What tool was used to design the app?
                             </AccordionTrigger>

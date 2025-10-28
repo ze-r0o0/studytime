@@ -29,6 +29,7 @@ import './WeeklySchedule.css';
   - Color picker always visible in the Edit modal.
   - Save and Remove buttons are side-by-side at the bottom of the modal.
   - Edit modal stays open after confirmation to allow multiple actions.
+  - Day headers show day number and day name (e.g., "27 Mon")
 */
 
 // date-fns localizer
@@ -232,8 +233,12 @@ export default function WeeklySchedule() {
         });
     };
 
-    // calendar formats
-    const formats = { timeGutterFormat: (date) => format(date, 'h:00'), eventTimeRangeFormat: () => null, dayFormat: (date) => format(date, 'EEEE') };
+    // calendar formats - custom day format to show "27 Mon"
+    const formats = {
+        timeGutterFormat: (date) => format(date, 'h:00'),
+        eventTimeRangeFormat: () => null,
+        dayFormat: (date) => `${format(date, 'd')} ${format(date, 'EEE')}`
+    };
     const TimeGutterHeader = () => <div style={{ padding: '12px 0' }} />;
 
     // EDIT modal component (kept inline for convenience) - with proper dark mode support

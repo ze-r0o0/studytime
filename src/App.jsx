@@ -11,7 +11,7 @@ export default function App() {
     return (
         <>
             <Navbar />
-            <div className="pt-16 min-h-screen w-full bg-background">
+            <div className="min-h-screen w-full bg-background">
                 <Routes>
                     <Route path="/" element={<Navigate to="/Home" replace />} />
                     <Route path="/Home" element={<Home />} />

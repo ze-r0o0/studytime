@@ -1,12 +1,8 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import logo from "@/assets/logo.svg";
 import { UserRound, Menu } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import {
-    NavigationMenu,
-    NavigationMenuItem,
-    NavigationMenuList,
-} from "@/components/ui/navigation-menu";
 import {
     Popover,
     PopoverContent,
@@ -24,6 +20,8 @@ const navigationLinks = [
 export default function Component() {
     const [, setScrolled] = useState(false);
     const [profilePicture, setProfilePicture] = useState(null);
+    const [userName, setUserName] = useState("User");
+    const location = useLocation();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -35,30 +33,44 @@ export default function Component() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // Load profile picture from localStorage
+    // Load profile picture and name from localStorage
     useEffect(() => {
-        const loadProfilePicture = () => {
+        const loadProfileData = () => {
             const preview = localStorage.getItem("preview");
             const selectedAvatar = localStorage.getItem("selectedAvatar");
+            const profileData = localStorage.getItem("profileFormData");
+
             setProfilePicture(preview || selectedAvatar || null);
+
+            if (profileData) {
+                const parsedData = JSON.parse(profileData);
+                // Get first name only (split by space and take first part)
+                const firstName = parsedData.fullName?.split(' ')[0] || "User";
+                setUserName(firstName);
+            }
         };
 
-        loadProfilePicture();
+        loadProfileData();
 
         // Listen for storage changes (when profile is updated in Settings)
-        window.addEventListener("storage", loadProfilePicture);
+        window.addEventListener("storage", loadProfileData);
 
         // Custom event for same-tab updates
-        window.addEventListener("profileUpdated", loadProfilePicture);
+        window.addEventListener("profileUpdated", loadProfileData);
 
         return () => {
-            window.removeEventListener("storage", loadProfilePicture);
-            window.removeEventListener("profileUpdated", loadProfilePicture);
+            window.removeEventListener("storage", loadProfileData);
+            window.removeEventListener("profileUpdated", loadProfileData);
         };
     }, []);
 
+    // Helper function to check if link is active
+    const isActiveLink = (path) => {
+        return location.pathname === path;
+    };
+
     return (
-        <header className="fixed top-0 left-0 w-full z-50 border-b px-2 sm:px-4 md:px-6 lg:px-8 transition-colors duration-300 bg-white dark:bg-background">
+        <header className="fixed top-0 left-0 w-full z-50 border-b dark:border-gray-700 px-2 sm:px-4 md:px-6 lg:px-8 transition-colors duration-300 bg-white dark:bg-gray-900">
             <div className="flex h-14 sm:h-16 items-center justify-between gap-2 sm:gap-4">
                 {/* Left side */}
                 <div className="flex items-center gap-1 sm:gap-2">
@@ -70,24 +82,25 @@ export default function Component() {
                                 variant="ghost"
                                 size="icon"
                             >
-                                <Menu className="size-4" />
+                                <Menu className="size-4 text-gray-900 dark:text-gray-100" />
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent align="start" className="w-36 p-1 sm:hidden">
-                            <NavigationMenu className="max-w-none *:w-full">
-                                <NavigationMenuList className="flex-col items-start gap-0 md:gap-2">
-                                    {navigationLinks.map((link, index) => (
-                                        <NavigationMenuItem key={index} className="w-full">
-                                            <Link
-                                                to={link.path}
-                                                className="block py-1.5 w-full text-sm hover:text-primary"
-                                            >
-                                                {link.label}
-                                            </Link>
-                                        </NavigationMenuItem>
-                                    ))}
-                                </NavigationMenuList>
-                            </NavigationMenu>
+                        <PopoverContent align="start" className="w-36 p-1 sm:hidden bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                            <nav className="flex flex-col gap-1">
+                                {navigationLinks.map((link, index) => (
+                                    <Link
+                                        key={index}
+                                        to={link.path}
+                                        className={`block py-2 px-3 w-full text-sm rounded-md transition-colors ${
+                                            isActiveLink(link.path)
+                                                ? "bg-blue-100 dark:bg-blue-900/30 text-gray-900 dark:text-white font-semibold"
+                                                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                                        }`}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </nav>
                         </PopoverContent>
                     </Popover>
                     {/* Main nav */}
@@ -96,34 +109,45 @@ export default function Component() {
                             <img src={logo} alt="Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
                         </Link>
 
-                        {/* Navigation menu */}
-                        <NavigationMenu className="max-sm:hidden">
-                            <NavigationMenuList className="gap-1 sm:gap-2 md:gap-3">
+                        {/* Navigation menu - Desktop */}
+                        <nav className="max-sm:hidden">
+                            <ul className="flex items-center gap-1 sm:gap-2 md:gap-3">
                                 {navigationLinks.map((link, index) => (
-                                    <NavigationMenuItem key={index}>
+                                    <li key={index}>
                                         <Link
                                             to={link.path}
-                                            className="py-1 sm:py-1.5 px-2 sm:px-3 text-sm sm:text-base font-medium inline-block text-muted-foreground hover:text-primary"
+                                            className={`py-1 sm:py-1.5 px-2 sm:px-3 text-sm sm:text-base font-medium inline-block rounded-md transition-colors ${
+                                                isActiveLink(link.path)
+                                                    ? "bg-blue-100 dark:bg-blue-900/30 text-gray-900 dark:text-white font-semibold"
+                                                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                                            }`}
                                         >
                                             {link.label}
                                         </Link>
-                                    </NavigationMenuItem>
+                                    </li>
                                 ))}
-                            </NavigationMenuList>
-                        </NavigationMenu>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
-                {/* Right side */}
-                <div className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100 overflow-hidden">
-                    {profilePicture ? (
-                        <img
-                            src={profilePicture}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <UserRound className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
-                    )}
+                {/* Right side - User greeting and avatar */}
+                <div className="flex items-center gap-2 sm:gap-3">
+                    {/* Greeting text - hidden on very small screens */}
+                    <span className="hidden sm:block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300">
+                        Hello, <span className="text-gray-900 dark:text-white font-semibold">{userName}</span>
+                    </span>
+                    {/* Profile avatar */}
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 overflow-hidden flex-shrink-0">
+                        {profilePicture ? (
+                            <img
+                                src={profilePicture}
+                                alt="Profile"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <UserRound className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 dark:text-blue-400" />
+                        )}
+                    </div>
                 </div>
             </div>
         </header>

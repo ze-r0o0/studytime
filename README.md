@@ -1,4 +1,4 @@
-# Study Time ⏰
+wwwwwwwwwwwwwwwwwwwwwwwwww# Study Time ⏰
 
 A modern, web-based study planner designed to help students manage their time and tasks effectively. Built with React and Vite for optimal performance and user experience.
 
@@ -10,12 +10,7 @@ A modern, web-based study planner designed to help students manage their time an
 - [Tech Stack](#-tech-stack)
 - [Getting Started](#-getting-started)
 - [Installation](#installation)
-- [Usage](#-usage)
-- [Project Structure](#-project-structure)
 - [Screenshots](#-screenshots)
-- [Contributing](#-contributing)
-- [License](#-license)
-- [Contact](#-contact)
 
 ## ✨ Features
 

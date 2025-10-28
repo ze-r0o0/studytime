@@ -4,9 +4,9 @@ import playstore from "@/assets/playstore.png";
 
 export default function StudyPlanner() {
     return (
-        <div className="max-w-7xl mx-auto pt-80 px-4 bg-background text-foreground">
+        <div className="max-w-7xl mx-auto pt-30  bg-background text-foreground">
             {/* Page-level title  */}
-            <h1 className="text-3xl font-bold mb-6 text-left">Your Weekly Schedule</h1>
+            <h2 className="text-2xl font-bold mb-6 text-left">Your Weekly Schedule</h2>
             {/* Calendar component  */}
             <WeeklySchedule />
             
