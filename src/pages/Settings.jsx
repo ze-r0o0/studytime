@@ -16,6 +16,7 @@ import toast, { Toaster } from 'react-hot-toast';
   - Features: edit profile (name, email, bio), change profile picture (stock avatars or upload custom), theme toggle.
   - All changes persist to localStorage and trigger a "profileUpdated" event for other components.
   - Uses modals for edit profile, choose photo, and save confirmation.
+  - Full dark mode support.
 */
 
 export default function Settings() {
@@ -116,7 +117,7 @@ export default function Settings() {
     };
 
     return (
-        <div className="min-h-screen bg-background text-foreground pt-80 md:pt-[500px] px-4 pb-8 overflow-auto">
+        <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 pt-80 md:pt-[500px] px-4 pb-8 overflow-auto">
             {/* Toast notification container (bottom-right) */}
             <Toaster
                 position="bottom-right"
@@ -135,10 +136,10 @@ export default function Settings() {
             <div className="mx-auto max-w-4xl w-full">
                 <div className="flex flex-col min-h-[70vh] w-full">
                     {/* Page title and subtitle */}
-                    <label className="text-4xl sm:text-2xl font-semibold text-left mb-2">
+                    <label className="text-4xl sm:text-2xl font-semibold text-left mb-2 text-gray-900 dark:text-gray-100">
                         Profile Information
                     </label>
-                    <p className="text-sm sm:text-base text-left mb-6 sm:mb-8">
+                    <p className="text-sm sm:text-base text-left mb-6 sm:mb-8 text-gray-600 dark:text-gray-400">
                         Manage your personal details and profile picture.
                     </p>
 
@@ -146,7 +147,7 @@ export default function Settings() {
                     <div className="flex items-start gap-x-3 sm:gap-x-4 mb-8">
                         <div className="relative">
                             {/* Profile avatar (displays preview, selectedAvatar, or default icon) */}
-                            <div className="w-16 h-16 sm:w-26 sm:h-26 flex items-center justify-center rounded-full bg-blue-100 flex-shrink-0 overflow-hidden">
+                            <div className="w-16 h-16 sm:w-26 sm:h-26 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 flex-shrink-0 overflow-hidden">
                                 {preview ? (
                                     <img
                                         src={preview}
@@ -160,19 +161,19 @@ export default function Settings() {
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
-                                    <UserRound className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500" />
+                                    <UserRound className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500 dark:text-blue-400" />
                                 )}
                             </div>
                         </div>
                         <div className="flex flex-col">
                             {/* Display user's full name */}
-                            <span className="text-base sm:text-lg font-semibold mb-2">
+                            <span className="text-base sm:text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
                                 {formData.fullName}
                             </span>
                             {/* Edit profile button: opens edit modal */}
                             <button
                                 onClick={handleEditProfileOpen}
-                                className="bg-white border-2 border-blue-500 hover:bg-blue-600 hover:text-white text-blue-600 font-medium rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base transition-colors"
+                                className="bg-white dark:bg-gray-800 border-2 border-blue-500 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-blue-600 dark:text-blue-400 font-medium rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base transition-colors"
                             >
                                 Edit Profile
                             </button>
@@ -182,33 +183,33 @@ export default function Settings() {
                     {/* Full Name field (read-only display) */}
                     <div className="flex items-center gap-x-2 mb-1">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
-                            <UserRound className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
+                            <UserRound className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 dark:text-gray-500" />
                         </div>
-                        <span className="text-sm sm:text-base text-gray-600">Full Name</span>
+                        <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Full Name</span>
                     </div>
-                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-4 text-left">
+                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-4 text-left text-gray-900 dark:text-gray-100">
                         {formData.fullName}
                     </p>
 
                     {/* Email field (read-only display) */}
                     <div className="flex items-center gap-x-2 mb-1">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
-                            <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
+                            <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 dark:text-gray-500" />
                         </div>
-                        <span className="text-sm sm:text-base text-gray-600">Email</span>
+                        <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Email</span>
                     </div>
-                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-4 text-left">
+                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-4 text-left text-gray-900 dark:text-gray-100">
                         {formData.email}
                     </p>
 
                     {/* Bio field (read-only display) */}
                     <div className="flex items-center gap-x-2 mb-1">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
-                            <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
+                            <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 dark:text-gray-500" />
                         </div>
-                        <span className="text-sm sm:text-base text-gray-600">Bio</span>
+                        <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Bio</span>
                     </div>
-                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-8 text-left">
+                    <p className="pl-10 sm:pl-12 text-sm sm:text-base mb-8 text-left text-gray-900 dark:text-gray-100">
                         {formData.bio}
                     </p>
 
@@ -216,10 +217,10 @@ export default function Settings() {
 
                     {/* Theme Settings section */}
                     <div className="flex flex-col mb-4">
-                        <h2 className="text-xl sm:text-2xl font-semibold text-left mb-2">
+                        <h2 className="text-xl sm:text-2xl font-semibold text-left mb-2 text-gray-900 dark:text-gray-100">
                             Theme Settings
                         </h2>
-                        <p className="text-sm sm:text-base text-left mb-4">
+                        <p className="text-sm sm:text-base text-left mb-4 text-gray-600 dark:text-gray-400">
                             Adjust the application's visual theme.
                         </p>
                     </div>
@@ -237,7 +238,7 @@ export default function Settings() {
                     <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start justify-between px-6 py-6">
                         <div className="flex gap-4">
                             <img src={logo} alt="Logo" className="w-10 h-10" />
-                            <p className="text-sm text-gray-600 max-w-xs text-left">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xs text-left">
                                 Study Time: A Web-Based Study Planner for Managing Time and Tasks
                             </p>
                         </div>
@@ -248,7 +249,7 @@ export default function Settings() {
                         </div>
                     </div>
 
-                    <div className="border-t flex justify-between items-center px-6 py-4 text-xs text-gray-500">
+                    <div className="border-t dark:border-gray-700 flex justify-between items-center px-6 py-4 text-xs text-gray-500 dark:text-gray-400">
                         <p>© 2024 BSCS 3-1B. All rights reserved.</p>
                         <p>Study Time™</p>
                     </div>
@@ -310,6 +311,7 @@ export default function Settings() {
   - Modal for editing profile details (name, email, bio) and changing avatar.
   - Displays current avatar with camera icon to open photo picker.
   - Changes are saved to local state until user confirms via "Save changes".
+  - Dark mode support.
 */
 function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, formData, setFormData, onSaveClick }) {
     // Local state: temporary form data (changes not committed until save)
@@ -332,11 +334,11 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-60">
-            <div className="bg-white rounded-lg w-[500px] shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg w-[500px] shadow-lg p-6">
                 {/* Modal header */}
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold">Edit Profile</h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Edit Profile</h2>
+                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                         ✕
                     </button>
                 </div>
@@ -345,7 +347,7 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                 <div className="flex items-start mb-6">
                     <div className="relative">
                         {/* Display current avatar (preview, selectedAvatar, or default) */}
-                        <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
+                        <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center overflow-hidden">
                             {preview ? (
                                 <img
                                     src={preview}
@@ -359,54 +361,54 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                                     className="w-full h-full object-cover"
                                 />
                             ) : (
-                                <UserRound className="w-10 h-10 text-blue-500" />
+                                <UserRound className="w-10 h-10 text-blue-500 dark:text-blue-400" />
                             )}
                         </div>
                         {/* Camera icon button: opens photo selection modal */}
                         <button
                             onClick={openPhotoModal}
-                            className="absolute bottom-0 right-0 bg-blue-500 border border-white rounded-full p-1 cursor-pointer"
+                            className="absolute bottom-0 right-0 bg-blue-500 border border-white dark:border-gray-800 rounded-full p-1 cursor-pointer"
                         >
                             <Camera className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                         </button>
                     </div>
                     {/* Avatar hint text */}
                     <div className="ml-4 flex flex-col text-left">
-                        <span className="font-bold text-sm text-gray-500">Profile Photo</span>
-                        <span className="text-sm text-gray-500">Click the camera icon to update</span>
+                        <span className="font-bold text-sm text-gray-500 dark:text-gray-400">Profile Photo</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">Click the camera icon to update</span>
                     </div>
                 </div>
 
                 {/* Form fields: Full Name, Email, Bio */}
                 <div className="space-y-4 text-left">
                     <div>
-                        <label className="block text-sm text-gray-600 mb-1">Full Name</label>
+                        <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">Full Name</label>
                         <input
                             type="text"
                             name="fullName"
                             value={localFormData.fullName}
                             onChange={handleChange}
-                            className="w-full border rounded-md px-3 py-2 bg-gray-100"
+                            className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-600 mb-1">Email</label>
+                        <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">Email</label>
                         <input
                             type="email"
                             name="email"
                             value={localFormData.email}
                             onChange={handleChange}
-                            className="w-full border rounded-md px-3 py-2 bg-gray-100"
+                            className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-600 mb-1">Bio</label>
+                        <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">Bio</label>
                         <textarea
                             name="bio"
                             value={localFormData.bio}
                             onChange={handleChange}
                             rows="3"
-                            className="w-full border rounded-md px-3 py-2 bg-gray-100"
+                            className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         ></textarea>
                     </div>
                 </div>
@@ -415,7 +417,7 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
                 <div className="flex justify-end gap-2 mt-6">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 rounded-md border hover:bg-gray-100"
+                        className="px-4 py-2 rounded-md border dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
                     >
                         Cancel
                     </button>
@@ -436,6 +438,7 @@ function EditProfileModal({ onClose, openPhotoModal, preview, selectedAvatar, fo
   - Modal for choosing a profile picture (stock avatars, default icon, or upload custom).
   - Shows preview of selected/uploaded image before saving.
   - Returns to edit profile modal after saving.
+  - Dark mode support.
 */
 function PhotoProfileModal({ setSelectedAvatar, setPreview, selectedAvatar, preview, onSave, returnToEditProfile }) {
     // Handle file upload: read file and set preview URL
@@ -455,11 +458,11 @@ function PhotoProfileModal({ setSelectedAvatar, setPreview, selectedAvatar, prev
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-70">
-            <div className="bg-white rounded-lg w-[500px] shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg w-[500px] shadow-lg p-6">
                 {/* Modal header */}
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold">Choose Profile Picture</h2>
-                    <button onClick={returnToEditProfile} className="text-gray-500 hover:text-gray-700">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Choose Profile Picture</h2>
+                    <button onClick={returnToEditProfile} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                         ✕
                     </button>
                 </div>
@@ -467,8 +470,8 @@ function PhotoProfileModal({ setSelectedAvatar, setPreview, selectedAvatar, prev
                 {/* Stock avatars section */}
                 <div className="text-left mb-4">
                     <div className="flex justify-between mb-2">
-                        <p className="font-semibold text-sm">Stock Avatars</p>
-                        <p className="font-semibold text-sm">Default Avatar</p>
+                        <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">Stock Avatars</p>
+                        <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">Default Avatar</p>
                     </div>
 
                     {/* Stock avatar images + default icon */}
@@ -493,7 +496,7 @@ function PhotoProfileModal({ setSelectedAvatar, setPreview, selectedAvatar, prev
                         )}
                         {/* Default avatar (UserRound icon) */}
                         <div
-                            className={`w-18 h-18 rounded-full flex items-center justify-center bg-gray-100 cursor-pointer border-2 ${
+                            className={`w-18 h-18 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 cursor-pointer border-2 ${
                                 !selectedAvatar && !preview ? "border-blue-500" : "border-transparent"
                             }`}
                             onClick={() => {
@@ -501,16 +504,16 @@ function PhotoProfileModal({ setSelectedAvatar, setPreview, selectedAvatar, prev
                                 setPreview(null);
                             }}
                         >
-                            <UserRound className="w-10 h-10 text-blue-500" />
+                            <UserRound className="w-10 h-10 text-blue-500 dark:text-blue-400" />
                         </div>
                     </div>
                 </div>
 
                 {/* Upload custom image section */}
                 <div className="mb-4 text-left">
-                    <p className="font-semibold text-sm mb-2">Upload Your Own</p>
-                    <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                        <span className="text-sm text-gray-500 mb-2">
+                    <p className="font-semibold text-sm mb-2 text-gray-900 dark:text-gray-100">Upload Your Own</p>
+                    <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+                        <span className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                             Choose photo from your device.
                         </span>
                         {/* Hidden file input triggered by label */}
@@ -523,7 +526,7 @@ function PhotoProfileModal({ setSelectedAvatar, setPreview, selectedAvatar, prev
 
                 {/* Preview section: shows selected avatar or uploaded image */}
                 <div className="text-left mb-4">
-                    <p className="font-semibold text-sm mb-2">Preview</p>
+                    <p className="font-semibold text-sm mb-2 text-gray-900 dark:text-gray-100">Preview</p>
                     <div className="flex justify-center">
                         {preview ? (
                             <img
@@ -538,8 +541,8 @@ function PhotoProfileModal({ setSelectedAvatar, setPreview, selectedAvatar, prev
                                 className="w-20 h-20 rounded-full object-cover"
                             />
                         ) : (
-                            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
-                                <UserRound className="text-gray-500 w-8 h-8" />
+                            <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                <UserRound className="text-gray-500 dark:text-gray-400 w-8 h-8" />
                             </div>
                         )}
                     </div>
@@ -549,7 +552,7 @@ function PhotoProfileModal({ setSelectedAvatar, setPreview, selectedAvatar, prev
                 <div className="flex justify-end gap-2 mt-6">
                     <button
                         onClick={returnToEditProfile}
-                        className="px-4 py-2 rounded-md border hover:bg-gray-100"
+                        className="px-4 py-2 rounded-md border dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100"
                     >
                         Cancel
                     </button>

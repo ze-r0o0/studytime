@@ -1,3 +1,9 @@
+/* WeeklySchedule.css
+   - Light and Dark mode compatible styles.
+   - Uses the presence of the .dark class on <body> to switch to dark mode.
+*/
+
+/* Container */
 .weekly-schedule-container {
     padding: 32px;
     background: white;
@@ -7,6 +13,13 @@
     margin: 0 auto;
 }
 
+/* Dark mode container */
+.dark .weekly-schedule-container {
+    background: #1f2937;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Controls */
 .schedule-controls {
     display: flex;
     justify-content: space-between;
@@ -40,12 +53,28 @@
     border-color: #ccc;
 }
 
+/* Dark mode navigation button */
+.dark .nav-button {
+    background: #374151;
+    border-color: #4b5563;
+    color: #d1d5db;
+}
+
+.dark .nav-button:hover {
+    background: #4b5563;
+    border-color: #6b7280;
+}
+
 .week-range {
     font-size: 18px;
     font-weight: 600;
     color: #333;
     min-width: 100px;
     text-align: center;
+}
+
+.dark .week-range {
+    color: #e5e7eb;
 }
 
 .edit-button {
@@ -64,7 +93,7 @@
     background: #2563eb;
 }
 
-/* Override react-big-calendar styles */
+/* Override react-big-calendar styles - LIGHT MODE */
 .rbc-calendar {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
@@ -253,6 +282,105 @@
     border-right: 1px solid #e5e7eb;
 }
 
+/* ============================================
+   DARK MODE OVERRIDES
+   ============================================ */
+
+/* Dark mode: Calendar header */
+.dark .rbc-header {
+    color: #60a5fa;
+    background: #1f2937;
+    border-bottom-color: #374151;
+    border-left-color: #374151;
+}
+
+/* Dark mode: Time slots */
+.dark .rbc-time-slot {
+    border-top-color: #374151;
+}
+
+.dark .rbc-timeslot-group {
+    border-top-color: #374151;
+}
+
+.dark .rbc-day-slot .rbc-time-slot {
+    border-top-color: #374151;
+}
+
+/* Dark mode: Vertical lines between days */
+.dark .rbc-day-bg + .rbc-day-bg {
+    border-left-color: #374151;
+}
+
+.dark .rbc-time-column + .rbc-time-column {
+    border-left-color: #374151;
+}
+
+/* Dark mode: Time gutter (left side time labels) */
+.dark .rbc-time-gutter {
+    color: #9ca3af;
+    background: #1f2937;
+}
+
+.dark .rbc-time-header-gutter {
+    background: #1f2937;
+    border-right-color: #374151;
+}
+
+/* Dark mode: Time content area */
+.dark .rbc-time-content {
+    background: #1f2937;
+    border-left-color: #374151;
+}
+
+.dark .rbc-time-header {
+    background: #1f2937;
+    border-bottom-color: #374151;
+}
+
+.dark .rbc-time-header-content {
+    border-left-color: #374151;
+}
+
+/* Dark mode: Day columns */
+.dark .rbc-time-column {
+    background: #1f2937;
+}
+
+/* Dark mode: Today highlight */
+.dark .rbc-today {
+    background-color: #374151;
+}
+
+/* Dark mode: Off range */
+.dark .rbc-off-range-bg {
+    background: #111827;
+}
+
+/* Dark mode: Calendar wrapper */
+.dark .rbc-time-view {
+    border-color: #374151;
+}
+
+/* Dark mode: Time gutter in content */
+.dark .rbc-time-gutter.rbc-time-column {
+    border-right-color: #374151;
+}
+
+/* Dark mode: Drag and drop hover */
+.dark .rbc-addons-dnd-over {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Dark mode: Event styling (keep events colorful but with better shadow) */
+.dark .rbc-event {
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+
+.dark .rbc-event:hover {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .schedule-controls {
@@ -267,5 +395,9 @@
 
     .edit-button {
         align-self: flex-end;
+    }
+
+    .schedule-header h1 {
+        font-size: 24px;
     }
 }

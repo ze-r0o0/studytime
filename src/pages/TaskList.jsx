@@ -9,6 +9,13 @@ import { Calendar, Plus, Search, Trash2, Clock, Check, X, AlertTriangle } from "
 import { format, parseISO, isToday, isThisWeek, addDays, isBefore } from "date-fns";
 import { RemoveConfirmModal, SaveConfirmModal } from "../components/ui/ConfirmModals.jsx";
 import toast, { Toaster } from 'react-hot-toast';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useDarkMode } from "@/lib/DarkModeContext";
+import logo from "@/assets/logo.svg";
+import playstore from "@/assets/playstore.png";
 
 /*
   TaskList.jsx
@@ -16,6 +23,9 @@ import toast, { Toaster } from 'react-hot-toast';
   - Features: add tasks with subject + due date, filter/search, categorize by date range (today, this week, next week, later).
   - Uses accordion UI for collapsible task groups.
   - Toast notifications for add/complete/remove actions.
+  - Dark mode support via Tailwind's dark: classes and MUI theme.
+  - Uses @mui/x-date-pickers for dark mode compatible date/time picker.
+  - Simple scrollable layout with title always visible at scroll top.
 */
 
 // Predefined subject options for the dropdown
@@ -33,6 +43,16 @@ const subjectOptions = [
 ];
 
 export default function TaskList() {
+    // Access dark mode context
+    const { enabled: darkModeEnabled } = useDarkMode();
+
+    // Create MUI theme based on dark mode state
+    const muiTheme = createTheme({
+        palette: {
+            mode: darkModeEnabled ? 'dark' : 'light',
+        },
+    });
+
     // State: tasks array loaded from localStorage on mount (or empty array if none)
     const [tasks, setTasks] = useState(() => {
         const storedTasks = localStorage.getItem("tasks");
@@ -42,7 +62,7 @@ export default function TaskList() {
     // State: form inputs for adding a new task
     const [newTask, setNewTask] = useState(""); // task title
     const [selectedSubject, setSelectedSubject] = useState(""); // chosen subject
-    const [dueDate, setDueDate] = useState(format(new Date(), "yyyy-MM-dd'T'HH:mm")); // default to current date/time
+    const [dueDate, setDueDate] = useState(new Date()); // default to current date/time
 
     // State: filtering and search
     const [searchTerm, setSearchTerm] = useState(""); // text search across title/subject
@@ -83,7 +103,7 @@ export default function TaskList() {
             id: Date.now().toString(),
             title: newTask,
             subject: selectedSubject,
-            dueDate: dueDate,
+            dueDate: dueDate.toISOString(), // Convert Date object to ISO string
             completed: false,
             createdAt: new Date().toISOString()
         };
@@ -193,7 +213,7 @@ export default function TaskList() {
 
         // Overdue: date is in the past
         if (isBefore(date, now)) {
-            return { text: "Overdue", className: "text-red-500" };
+            return { text: "Overdue", className: "text-red-500 dark:text-red-400" };
         }
 
         // Calculate days until due
@@ -201,32 +221,32 @@ export default function TaskList() {
 
         // Color code by urgency
         if (daysUntil <= 1) {
-            return { text: `Due in ${daysUntil} day`, className: "text-orange-500" };
+            return { text: `Due in ${daysUntil} day`, className: "text-orange-500 dark:text-orange-400" };
         } else if (daysUntil <= 3) {
-            return { text: `Due in ${daysUntil} days`, className: "text-yellow-500" };
+            return { text: `Due in ${daysUntil} days`, className: "text-yellow-500 dark:text-yellow-400" };
         }
 
-        return { text: `Due in ${daysUntil} days`, className: "text-gray-500" };
+        return { text: `Due in ${daysUntil} days`, className: "text-gray-500 dark:text-gray-400" };
     };
 
     // Helper: render task items for a given list (used in accordion content)
     const renderTaskItems = (taskList) => {
         return taskList.map(task => (
-            <div key={task.id} className="border-b py-3 px-1 flex items-center gap-2">
+            <div key={task.id} className="border-b dark:border-gray-700 py-3 px-1 flex items-center gap-2">
                 {/* Checkbox: toggle completed status */}
                 <input
                     type="checkbox"
                     checked={task.completed}
                     onChange={() => toggleTaskComplete(task.id)}
-                    className="w-5 h-5 rounded border-gray-300"
+                    className="w-5 h-5 rounded border-gray-300 dark:border-gray-600"
                 />
 
                 {/* Task details */}
                 <div className="flex-1">
-                    <div className={`font-medium text-left ${task.completed ? "line-through text-gray-500" : ""}`}>
+                    <div className={`font-medium text-left ${task.completed ? "line-through text-gray-500 dark:text-gray-400" : "text-gray-900 dark:text-gray-100"}`}>
                         {task.title}
                     </div>
-                    <div className="flex flex-wrap gap-x-4 text-xs text-gray-500 mt-1">
+                    <div className="flex flex-wrap gap-x-4 text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {/* Subject badge */}
                         {task.subject && (
                             <span className="flex items-center gap-1">
@@ -251,7 +271,7 @@ export default function TaskList() {
                 {/* Delete button: opens confirmation modal */}
                 <button
                     onClick={() => promptDeleteTask(task)}
-                    className="text-gray-400 hover:text-red-500 p-1"
+                    className="text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 p-1"
                     aria-label="Delete task"
                 >
                     <Trash2 className="w-4 h-4" />
@@ -261,244 +281,307 @@ export default function TaskList() {
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto mt-8 px-4">
-            {/* Toast notification container (bottom-right) */}
-            <Toaster
-                position="bottom-right"
-                toastOptions={{
-                    className: '',
-                    style: {
-                        padding: '16px',
-                        borderRadius: '8px',
-                        background: '#fff',
-                        color: '#333',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                    },
-                }}
-            />
+        <ThemeProvider theme={muiTheme}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                {/* Toast notification container (bottom-right) */}
+                <Toaster
+                    position="bottom-right"
+                    toastOptions={{
+                        className: '',
+                        style: {
+                            padding: '16px',
+                            borderRadius: '8px',
+                            background: '#fff',
+                            color: '#333',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                        },
+                    }}
+                />
 
-            {/* Page title and subtitle */}
-            <h2 className="text-2xl font-semibold mb-2 text-left">Task List</h2>
-            <p className="text-sm text-gray-500 mb-4 text-left">Add Task</p>
+                {/* Main scrollable container */}
+                <div className="w-full max-w-4xl mx-auto px-4 py-8 pt-50">
+                    {/* Page title and subtitle */}
+                    <h2 className="text-2xl font-semibold mb-2 text-left text-gray-900 dark:text-gray-100">Task List</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-left">Add Task</p>
 
-            {/* Add task form */}
-            <div className="border rounded-lg p-4 shadow-sm bg-background">
-                {/* Row 1: Subject dropdown and due date picker */}
-                <div className="flex flex-row items-center justify-between gap-3">
-                    <div className="flex flex-col min-w-[120px]">
-                        <label className="text-sm font-medium mb-1 text-left">Subject</label>
-                        <select
-                            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            value={selectedSubject}
-                            onChange={(e) => setSelectedSubject(e.target.value)}
+                    {/* Add task form */}
+                    <div className="border dark:border-gray-700 rounded-lg p-4 shadow-sm bg-white dark:bg-gray-800 mb-6">
+                        {/* Row 1: Subject dropdown and due date picker */}
+                        <div className="flex flex-row items-center justify-between gap-3">
+                            <div className="flex flex-col min-w-[120px]">
+                                <label className="text-sm font-medium mb-1 text-left text-gray-700 dark:text-gray-300">Subject</label>
+                                <select
+                                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                    value={selectedSubject}
+                                    onChange={(e) => setSelectedSubject(e.target.value)}
+                                >
+                                    <option value="">Select subject</option>
+                                    {subjectOptions.map(subject => (
+                                        <option key={subject} value={subject}>{subject}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            {/* MUI DateTimePicker with dark mode support */}
+                            <div className="flex flex-col">
+                                <label className="text-sm font-medium mb-1 text-left text-gray-700 dark:text-gray-300">Due Date</label>
+                                <DateTimePicker
+                                    value={dueDate}
+                                    onChange={(newValue) => setDueDate(newValue)}
+                                    slotProps={{
+                                        textField: {
+                                            size: 'small',
+                                            sx: {
+                                                '& .MuiOutlinedInput-root': {
+                                                    backgroundColor: darkModeEnabled ? '#374151' : 'white',
+                                                    '& fieldset': {
+                                                        borderColor: darkModeEnabled ? '#4b5563' : '#d1d5db',
+                                                    },
+                                                    '&:hover fieldset': {
+                                                        borderColor: darkModeEnabled ? '#6b7280' : '#9ca3af',
+                                                    },
+                                                    '&.Mui-focused fieldset': {
+                                                        borderColor: '#3b82f6',
+                                                    },
+                                                },
+                                                '& .MuiInputBase-input': {
+                                                    color: darkModeEnabled ? '#f3f4f6' : '#111827',
+                                                    fontSize: '0.875rem',
+                                                },
+                                                '& .MuiSvgIcon-root': {
+                                                    color: darkModeEnabled ? '#9ca3af' : '#6b7280',
+                                                },
+                                            },
+                                        },
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Row 2: Task title input and Add button */}
+                        <div className="flex flex-row items-center gap-3 pt-3">
+                            <input
+                                type="text"
+                                placeholder="Add a new task..."
+                                value={newTask}
+                                onChange={(e) => setNewTask(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') addTask(); // submit on Enter
+                                }}
+                                className="flex-1 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                            />
+
+                            <button
+                                onClick={addTask}
+                                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md px-4 py-2 transition"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Add Task
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Search and filter bar */}
+                    <div className="flex flex-row gap-4 mb-6">
+                        {/* Search input */}
+                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md px-3 py-2 w-full max-w-sm">
+                            <Search className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="bg-transparent outline-none text-sm text-gray-700 dark:text-gray-200 w-full placeholder-gray-400 dark:placeholder-gray-500"
+                            />
+                        </div>
+
+                        {/* Subject filter dropdown */}
+                        <div className="flex flex-col min-w-[120px]">
+                            <select
+                                className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                value={filterSubject}
+                                onChange={(e) => setFilterSubject(e.target.value)}
+                            >
+                                <option value="">All Subjects</option>
+                                {subjectOptions.map(subject => (
+                                    <option key={subject} value={subject}>{subject}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Task count label */}
+                        <label className="text-sm font-medium text-left ml-auto self-center text-gray-700 dark:text-gray-300">
+                            {filteredTasks.length} TASKS
+                        </label>
+                    </div>
+
+                    {/* Accordion section */}
+                    <div className="w-full mb-8">
+                        <Accordion
+                            type="single"
+                            collapsible
+                            className="w-full -space-y-px"
+                            value={activeTab}
+                            onValueChange={setActiveTab}
                         >
-                            <option value="">Select subject</option>
-                            {subjectOptions.map(subject => (
-                                <option key={subject} value={subject}>{subject}</option>
-                            ))}
-                        </select>
+                            {/* ALL TASKS */}
+                            <AccordionItem
+                                value="1"
+                                className="relative border dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
+                            >
+                                <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black text-gray-900 dark:text-gray-100">
+                                    ALL ({allTasks.length})
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-2 max-h-[400px] overflow-y-auto">
+                                    {allTasks.length > 0 ? (
+                                        <div className="space-y-1">
+                                            {renderTaskItems(allTasks)}
+                                        </div>
+                                    ) : (
+                                        <div className="text-gray-500 dark:text-gray-400 py-2 text-center">No tasks found</div>
+                                    )}
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            {/* NO DUE DATE */}
+                            <AccordionItem
+                                value="2"
+                                className="relative border dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
+                            >
+                                <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black text-gray-900 dark:text-gray-100">
+                                    NO DUE DATE ({noDateTasks.length})
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-2 max-h-[400px] overflow-y-auto">
+                                    {noDateTasks.length > 0 ? (
+                                        <div className="space-y-1">
+                                            {renderTaskItems(noDateTasks)}
+                                        </div>
+                                    ) : (
+                                        <div className="text-gray-500 dark:text-gray-400 py-2 text-center">No tasks without due date</div>
+                                    )}
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            {/* TODAY */}
+                            <AccordionItem
+                                value="3"
+                                className="relative border dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
+                            >
+                                <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black text-gray-900 dark:text-gray-100">
+                                    TODAY ({todayTasks.length})
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-2 max-h-[400px] overflow-y-auto">
+                                    {todayTasks.length > 0 ? (
+                                        <div className="space-y-1">
+                                            {renderTaskItems(todayTasks)}
+                                        </div>
+                                    ) : (
+                                        <div className="text-gray-500 dark:text-gray-400 py-2 text-center">No tasks due today</div>
+                                    )}
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            {/* THIS WEEK */}
+                            <AccordionItem
+                                value="4"
+                                className="relative border dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
+                            >
+                                <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black text-gray-900 dark:text-gray-100">
+                                    THIS WEEK ({thisWeekTasks.length})
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-2 max-h-[400px] overflow-y-auto">
+                                    {thisWeekTasks.length > 0 ? (
+                                        <div className="space-y-1">
+                                            {renderTaskItems(thisWeekTasks)}
+                                        </div>
+                                    ) : (
+                                        <div className="text-gray-500 dark:text-gray-400 py-2 text-center">No tasks due this week</div>
+                                    )}
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            {/* NEXT WEEK */}
+                            <AccordionItem
+                                value="5"
+                                className="relative border dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
+                            >
+                                <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black text-gray-900 dark:text-gray-100">
+                                    NEXT WEEK ({nextWeekTasks.length})
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-2 max-h-[400px] overflow-y-auto">
+                                    {nextWeekTasks.length > 0 ? (
+                                        <div className="space-y-1">
+                                            {renderTaskItems(nextWeekTasks)}
+                                        </div>
+                                    ) : (
+                                        <div className="text-gray-500 dark:text-gray-400 py-2 text-center">No tasks due next week</div>
+                                    )}
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            {/* LATER */}
+                            <AccordionItem
+                                value="6"
+                                className="relative border dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
+                            >
+                                <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black text-gray-900 dark:text-gray-100">
+                                    LATER ({laterTasks.length})
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-2 max-h-[400px] overflow-y-auto">
+                                    {laterTasks.length > 0 ? (
+                                        <div className="space-y-1">
+                                            {renderTaskItems(laterTasks)}
+                                        </div>
+                                    ) : (
+                                        <div className="text-gray-500 dark:text-gray-400 py-2 text-center">No tasks due later</div>
+                                    )}
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
                     </div>
-                    {/* Due date/time input */}
-                    <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 gap-2">
-                        <Calendar className="w-4 h-4 text-gray-500" />
-                        <input
-                            type="datetime-local"
-                            value={dueDate}
-                            onChange={(e) => setDueDate(e.target.value)}
-                            className="outline-none text-sm"
-                        />
-                    </div>
+
+                    {/* Footer: logo, description, app store link, copyright */}
+                    <footer className="w-full mt-8">
+                        {/* Footer top section: logo + description + app store link */}
+                        <div className="flex flex-col md:flex-row items-start justify-between py-6">
+                            {/* Logo and description */}
+                            <div className="flex gap-4">
+                                <img
+                                    src={logo}
+                                    alt="Logo"
+                                    className="w-10 h-10"
+                                />
+                                <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xs text-left">
+                                    Study Time: A Web-Based Study Planner for Managing Time and Tasks
+                                </p>
+                            </div>
+                            {/* App store download link */}
+                            <div className="mt-4 md:mt-0">
+                                <a href="#">
+                                    <img
+                                        src={playstore}
+                                        alt="Download on the App Store"
+                                        className="h-10"
+                                    />
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Footer bottom section: copyright and trademark */}
+                        <div className="border-t dark:border-gray-700 flex justify-between items-center py-4 text-xs text-gray-500 dark:text-gray-400">
+                            <p>© 2024 BSCS 3-1B. All rights reserved.</p>
+                            <p>Study Time™</p>
+                        </div>
+                    </footer>
                 </div>
 
-                {/* Row 2: Task title input and Add button */}
-                <div className="flex flex-row items-center gap-3 pt-3">
-                    <input
-                        type="text"
-                        placeholder="Add a new task..."
-                        value={newTask}
-                        onChange={(e) => setNewTask(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') addTask(); // submit on Enter
-                        }}
-                        className="flex-1 border border-gray-200 bg-gray-50 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-
-                    <button
-                        onClick={addTask}
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md px-4 py-2 transition"
-                    >
-                        <Plus className="w-4 h-4" />
-                        Add Task
-                    </button>
-                </div>
-            </div>
-
-            {/* Search and filter bar */}
-            <div className="flex flex-row mt-6 gap-4">
-                {/* Search input */}
-                <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-md px-3 py-2 w-full max-w-sm">
-                    <Search className="w-4 h-4 text-gray-500" />
-                    <input
-                        type="text"
-                        placeholder="Search"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="bg-transparent outline-none text-sm text-gray-700 w-full"
-                    />
-                </div>
-
-                {/* Subject filter dropdown */}
-                <div className="flex flex-col min-w-[120px]">
-                    <select
-                        className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        value={filterSubject}
-                        onChange={(e) => setFilterSubject(e.target.value)}
-                    >
-                        <option value="">All Subjects</option>
-                        {subjectOptions.map(subject => (
-                            <option key={subject} value={subject}>{subject}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Task count label */}
-                <label className="text-sm font-medium mb-1 text-left ml-auto">
-                    {filteredTasks.length} TASKS
-                </label>
-            </div>
-
-            {/* Accordion: categorized task lists (ALL, NO DUE DATE, TODAY, THIS WEEK, NEXT WEEK, LATER) */}
-            <div className="w-full mt-8">
-                <Accordion
-                    type="single"
-                    collapsible
-                    className="w-full -space-y-px"
-                    value={activeTab}
-                    onValueChange={setActiveTab}
-                >
-                    {/* ALL TASKS */}
-                    <AccordionItem
-                        value="1"
-                        className="relative border bg-background px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
-                    >
-                        <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black">
-                            ALL ({allTasks.length})
-                        </AccordionTrigger>
-                        <AccordionContent className="pb-2">
-                            {allTasks.length > 0 ? (
-                                <div className="space-y-1">
-                                    {renderTaskItems(allTasks)}
-                                </div>
-                            ) : (
-                                <div className="text-gray-500 py-2 text-center">No tasks found</div>
-                            )}
-                        </AccordionContent>
-                    </AccordionItem>
-
-                    {/* NO DUE DATE */}
-                    <AccordionItem
-                        value="2"
-                        className="relative border bg-background px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
-                    >
-                        <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black">
-                            NO DUE DATE ({noDateTasks.length})
-                        </AccordionTrigger>
-                        <AccordionContent className="pb-2">
-                            {noDateTasks.length > 0 ? (
-                                <div className="space-y-1">
-                                    {renderTaskItems(noDateTasks)}
-                                </div>
-                            ) : (
-                                <div className="text-gray-500 py-2 text-center">No tasks without due date</div>
-                            )}
-                        </AccordionContent>
-                    </AccordionItem>
-
-                    {/* TODAY */}
-                    <AccordionItem
-                        value="3"
-                        className="relative border bg-background px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
-                    >
-                        <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black">
-                            TODAY ({todayTasks.length})
-                        </AccordionTrigger>
-                        <AccordionContent className="pb-2">
-                            {todayTasks.length > 0 ? (
-                                <div className="space-y-1">
-                                    {renderTaskItems(todayTasks)}
-                                </div>
-                            ) : (
-                                <div className="text-gray-500 py-2 text-center">No tasks due today</div>
-                            )}
-                        </AccordionContent>
-                    </AccordionItem>
-
-                    {/* THIS WEEK */}
-                    <AccordionItem
-                        value="4"
-                        className="relative border bg-background px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
-                    >
-                        <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black">
-                            THIS WEEK ({thisWeekTasks.length})
-                        </AccordionTrigger>
-                        <AccordionContent className="pb-2">
-                            {thisWeekTasks.length > 0 ? (
-                                <div className="space-y-1">
-                                    {renderTaskItems(thisWeekTasks)}
-                                </div>
-                            ) : (
-                                <div className="text-gray-500 py-2 text-center">No tasks due this week</div>
-                            )}
-                        </AccordionContent>
-                    </AccordionItem>
-
-                    {/* NEXT WEEK */}
-                    <AccordionItem
-                        value="5"
-                        className="relative border bg-background px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
-                    >
-                        <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black">
-                            NEXT WEEK ({nextWeekTasks.length})
-                        </AccordionTrigger>
-                        <AccordionContent className="pb-2">
-                            {nextWeekTasks.length > 0 ? (
-                                <div className="space-y-1">
-                                    {renderTaskItems(nextWeekTasks)}
-                                </div>
-                            ) : (
-                                <div className="text-gray-500 py-2 text-center">No tasks due next week</div>
-                            )}
-                        </AccordionContent>
-                    </AccordionItem>
-
-                    {/* LATER */}
-                    <AccordionItem
-                        value="6"
-                        className="relative border bg-background px-4 py-1 outline-none first:rounded-t-md last:rounded-b-md last:border-b"
-                    >
-                        <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline focus-visible:ring-0 font-black">
-                            LATER ({laterTasks.length})
-                        </AccordionTrigger>
-                        <AccordionContent className="pb-2">
-                            {laterTasks.length > 0 ? (
-                                <div className="space-y-1">
-                                    {renderTaskItems(laterTasks)}
-                                </div>
-                            ) : (
-                                <div className="text-gray-500 py-2 text-center">No tasks due later</div>
-                            )}
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
-            </div>
-
-            {/* Remove confirmation modal (opens when user clicks delete button on a task) */}
-            <RemoveConfirmModal
-                isOpen={removeModalOpen}
-                onClose={() => setRemoveModalOpen(false)}
-                onConfirm={confirmDeleteTask}
-                subject="task"
-            />
-        </div>
+                {/* Remove confirmation modal (opens when user clicks delete button on a task) */}
+                <RemoveConfirmModal
+                    isOpen={removeModalOpen}
+                    onClose={() => setRemoveModalOpen(false)}
+                    onConfirm={confirmDeleteTask}
+                    subject="task"
+                />
+            </LocalizationProvider>
+        </ThemeProvider>
     );
 }

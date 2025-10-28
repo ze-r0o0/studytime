@@ -1,29 +1,24 @@
 // src/components/ui/DarkModeToggle.jsx
 import { useDarkMode } from "../../lib/DarkModeContext.jsx";
+import { Sun, Moon } from "lucide-react";
 
 export default function DarkModeToggle() {
     const { enabled, setEnabled } = useDarkMode();
 
     return (
-        <div className="w-full border rounded-lg p-4 flex items-center justify-between gap-4 shadow-sm">
+        <div className="w-full border dark:border-gray-700 rounded-lg p-4 flex items-center justify-between gap-4 shadow-sm bg-white dark:bg-gray-800">
             {/* Left: icon + texts */}
             <div className="flex items-start gap-3">
-                <svg
-                    className="w-4 h-4 text-yellow-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364-1.414 1.414M7.05 16.95l-1.414 1.414M16.95 16.95l1.414 1.414M6.343 6.343 4.929 4.929M12 8a4 4 0 100 8 4 4 0 000-8z"
-                    />
-                </svg>
+                {enabled ? (
+                    <Moon className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+                ) : (
+                    <Sun className="w-5 h-5 text-yellow-500" />
+                )}
                 <div className="flex flex-col">
-                    <span className="text-sm font-medium text-slate-800 text-left">Dark Mode</span>
-                    <span className="text-xs text-slate-500 mt-[2px]">
+                    <span className="text-sm font-medium text-slate-800 dark:text-gray-100 text-left">
+                        {enabled ? "Dark Mode" : "Light Mode"}
+                    </span>
+                    <span className="text-xs text-slate-500 dark:text-gray-400 mt-[2px]">
                         {enabled ? "Dark theme is enabled" : "Light theme is enabled"}
                     </span>
                 </div>
@@ -34,7 +29,7 @@ export default function DarkModeToggle() {
                 aria-checked={enabled}
                 onClick={() => setEnabled((s) => !s)}
                 className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors duration-200 focus:outline-none ${
-                    enabled ? "bg-indigo-600" : "bg-slate-200"
+                    enabled ? "bg-blue-600" : "bg-slate-200"
                 }`}
             >
                 <span

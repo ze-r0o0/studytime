@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import {
@@ -14,6 +14,7 @@ import enUS from 'date-fns/locale/en-US';
 import { X, Search } from 'lucide-react';
 import { ChromePicker } from 'react-color';
 import { RemoveConfirmModal, SaveConfirmModal } from "@/components/ui/ConfirmModals.jsx";
+import { useDarkMode } from "@/lib/DarkModeContext";
 import toast, { Toaster } from 'react-hot-toast';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
@@ -21,10 +22,13 @@ import './WeeklySchedule.css';
 
 /*
   WeeklySchedule.jsx
-  - The calendar + edit modal component (no page-level title).
-  - Save/Delete confirmations are kept but actions are intentionally non-persistent
-    (they only acknowledge/close) as requested.
-  - Color picker is always visible inside the Edit modal.
+  - Calendar + edit modal component with dark mode support.
+  - Integrates with DarkModeContext to sync theme across the app.
+  - Save/Delete confirmations are kept but actions are intentionally disabled.
+  - Toast notifications indicate that save/remove actions are disabled.
+  - Color picker always visible in the Edit modal.
+  - Save and Remove buttons are side-by-side at the bottom of the modal.
+  - Edit modal stays open after confirmation to allow multiple actions.
 */
 
 // date-fns localizer
@@ -51,8 +55,8 @@ function TimePickerModal({ isOpen, onClose, onSet, title }) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-[70]">
-            <div className="bg-white rounded-lg p-6 shadow-lg w-64">
-                <h3 className="text-lg font-semibold mb-4 text-left">{title}</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg w-64">
+                <h3 className="text-lg font-semibold mb-4 text-left text-gray-900 dark:text-gray-100">{title}</h3>
                 <div className="flex gap-2 mb-4 justify-center items-center">
                     {/* Hour input (1-12) */}
                     <input
@@ -61,9 +65,9 @@ function TimePickerModal({ isOpen, onClose, onSet, title }) {
                         max="12"
                         value={hour}
                         onChange={(e) => setHour(Math.min(12, Math.max(1, parseInt(e.target.value) || 1)))}
-                        className="w-16 text-center text-2xl border-b-2 border-gray-300 focus:border-blue-500 outline-none"
+                        className="w-16 text-center text-2xl border-b-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 outline-none bg-transparent text-gray-900 dark:text-gray-100"
                     />
-                    <span className="text-2xl">:</span>
+                    <span className="text-2xl text-gray-900 dark:text-gray-100">:</span>
                     {/* Minute input (0-59) */}
                     <input
                         type="number"
@@ -71,20 +75,20 @@ function TimePickerModal({ isOpen, onClose, onSet, title }) {
                         max="59"
                         value={String(minute).padStart(2, '0')}
                         onChange={(e) => setMinute(Math.min(59, Math.max(0, parseInt(e.target.value) || 0)))}
-                        className="w-16 text-center text-2xl border-b-2 border-gray-300 focus:border-blue-500 outline-none"
+                        className="w-16 text-center text-2xl border-b-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 outline-none bg-transparent text-gray-900 dark:text-gray-100"
                     />
                     {/* AM/PM selector */}
                     <select
                         value={period}
                         onChange={(e) => setPeriod(e.target.value)}
-                        className="text-xl border-b-2 border-gray-300 focus:border-blue-500 outline-none"
+                        className="text-xl border-b-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 outline-none bg-transparent text-gray-900 dark:text-gray-100"
                     >
                         <option>AM</option>
                         <option>PM</option>
                     </select>
                 </div>
                 <div className="flex justify-end gap-2">
-                    <button onClick={onClose} className="px-4 py-2 text-red-500 hover:bg-red-50 rounded">
+                    <button onClick={onClose} className="px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900 rounded">
                         Cancel
                     </button>
                     <button onClick={handleSet} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
@@ -97,6 +101,9 @@ function TimePickerModal({ isOpen, onClose, onSet, title }) {
 }
 
 export default function WeeklySchedule() {
+    // Access dark mode context
+    const { enabled: darkModeEnabled } = useDarkMode();
+
     // calendar / modal state
     const [currentDate, setCurrentDate] = useState(new Date());
     const [editModalOpen, setEditModalOpen] = useState(false);
@@ -187,34 +194,49 @@ export default function WeeklySchedule() {
         setPendingEventData(updatedEvent);
         setSaveModalOpen(true);
     };
+
+    // confirmSave: acknowledge save action but don't persist (show toast, keep edit modal open)
     const confirmSave = () => {
-        // intentionally do NOT persist changes (per request)
         setSaveModalOpen(false);
-        setEditModalOpen(false);
         setPendingEventData(null);
-        setSelectedEvent(null);
-        toast.success('Save acknowledged (disabled)');
+        // Edit modal stays open - do NOT close it
+        toast('Save action acknowledged (disabled)', {
+            icon: '💾',
+            duration: 2500,
+            style: {
+                borderRadius: '10px',
+                background: '#333',
+                color: '#fff',
+            },
+        });
     };
 
     // handle Remove from Edit modal: open confirmation modal (deletion intentionally disabled)
     const handleRemoveEvent = () => {
-        if (selectedEvent) {
-            setRemoveModalOpen(true);
-            setEditModalOpen(false);
-        }
+        setRemoveModalOpen(true);
+        // Edit modal stays open - do NOT close it
     };
+
+    // confirmRemove: acknowledge remove action but don't delete (show toast, keep edit modal open)
     const confirmRemove = () => {
-        // intentionally do NOT delete (per request)
         setRemoveModalOpen(false);
-        setSelectedEvent(null);
-        toast.success('Remove acknowledged (disabled)');
+        // Edit modal stays open - do NOT close it
+        toast('Remove action acknowledged (disabled)', {
+            icon: '🗑️',
+            duration: 2500,
+            style: {
+                borderRadius: '10px',
+                background: '#333',
+                color: '#fff',
+            },
+        });
     };
 
     // calendar formats
     const formats = { timeGutterFormat: (date) => format(date, 'h:00'), eventTimeRangeFormat: () => null, dayFormat: (date) => format(date, 'EEEE') };
     const TimeGutterHeader = () => <div style={{ padding: '12px 0' }} />;
 
-    // EDIT modal component (kept inline for convenience) -
+    // EDIT modal component (kept inline for convenience) - with proper dark mode support
     function EditModal({ isOpen, onClose, subject, subjects, onSave, onRemove }) {
         const [formData, setFormData] = useState({
             name: subject?.title || '',
@@ -236,79 +258,141 @@ export default function WeeklySchedule() {
         return (
             <>
                 <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-                    <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
                         <div className="flex justify-between items-start mb-4">
                             <div className="text-left">
-                                <h2 className="text-2xl font-semibold">Edit</h2>
-                                <p className="text-sm text-gray-500 mt-1">Select from the list then edit details below. Drag to place on the calendar or set time manually.</p>
+                                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Edit</h2>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Select from the list then edit details below. Drag to place on the calendar or set time manually.</p>
                             </div>
-                            <button onClick={onClose} className="text-gray-500 hover:text-gray-700"><X size={24} /></button>
+                            <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                <X size={24} />
+                            </button>
                         </div>
 
                         <div className="grid grid-cols-2 gap-6">
+                            {/* Left side - Form */}
                             <div className="space-y-4">
                                 <div className="text-left">
-                                    <label className="block text-sm font-medium mb-1">Name</label>
-                                    <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full border rounded-md px-3 py-2 bg-gray-50" />
+                                    <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Name</label>
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                    />
                                 </div>
 
                                 <div className="text-left">
-                                    <label className="block text-sm font-medium mb-1">Label</label>
-                                    <input type="text" value={formData.label} onChange={(e) => setFormData({ ...formData, label: e.target.value })} className="w-full border rounded-md px-3 py-2 bg-gray-50" />
+                                    <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Label</label>
+                                    <input
+                                        type="text"
+                                        value={formData.label}
+                                        onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+                                        className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                    />
                                 </div>
 
                                 <div className="text-left">
-                                    <label className="block text-sm font-medium mb-1">Start Time</label>
-                                    <input type="text" value={formData.startTime} readOnly onClick={() => setShowStartTimePicker(true)} className="w-full border rounded-md px-3 py-2 bg-gray-50 cursor-pointer" />
+                                    <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Start Time</label>
+                                    <input
+                                        type="text"
+                                        value={formData.startTime}
+                                        readOnly
+                                        onClick={() => setShowStartTimePicker(true)}
+                                        className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-50 dark:bg-gray-700 cursor-pointer text-gray-900 dark:text-gray-100"
+                                    />
                                 </div>
 
                                 <div className="text-left">
-                                    <label className="block text-sm font-medium mb-1">End Time</label>
-                                    <input type="text" value={formData.endTime} readOnly onClick={() => setShowEndTimePicker(true)} className="w-full border rounded-md px-3 py-2 bg-gray-50 cursor-pointer" />
+                                    <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">End Time</label>
+                                    <input
+                                        type="text"
+                                        value={formData.endTime}
+                                        readOnly
+                                        onClick={() => setShowEndTimePicker(true)}
+                                        className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-50 dark:bg-gray-700 cursor-pointer text-gray-900 dark:text-gray-100"
+                                    />
                                 </div>
 
                                 <div className="text-left">
-                                    <label className="block text-sm font-medium mb-1">Day</label>
+                                    <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Day</label>
                                     <div className="flex gap-2">
-                                        <select value={formData.day} onChange={(e) => setFormData({ ...formData, day: e.target.value })} className="flex-1 border rounded-md px-3 py-2 bg-gray-50">
+                                        <select
+                                            value={formData.day}
+                                            onChange={(e) => setFormData({ ...formData, day: e.target.value })}
+                                            className="flex-1 border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                        >
                                             {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => <option key={d} value={d}>{d}</option>)}
                                         </select>
-                                        <label className="flex items-center gap-2"><input type="checkbox" checked={formData.weekly} onChange={(e) => setFormData({ ...formData, weekly: e.target.checked })} /> <span className="text-sm">Weekly</span></label>
+                                        <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                                            <input type="checkbox" checked={formData.weekly} onChange={(e) => setFormData({ ...formData, weekly: e.target.checked })} />
+                                            <span className="text-sm">Weekly</span>
+                                        </label>
                                     </div>
                                 </div>
 
                                 <div className="text-left">
-                                    <label className="block text-sm font-medium mb-2">Subject Color</label>
+                                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Subject Color</label>
                                     <div className="flex flex-col gap-3">
                                         <ChromePicker color={formData.color} onChange={(c) => setFormData({ ...formData, color: c.hex })} disableAlpha />
-                                        <input type="text" value={formData.color} onChange={(e) => setFormData({ ...formData, color: e.target.value })} className="w-full border rounded-md px-3 py-2 bg-gray-50 uppercase" />
+                                        <input
+                                            type="text"
+                                            value={formData.color}
+                                            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                                            className="w-full border dark:border-gray-600 rounded-md px-3 py-2 bg-gray-50 dark:bg-gray-700 uppercase text-gray-900 dark:text-gray-100"
+                                        />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="border rounded-lg p-4">
-                                <h3 className="font-semibold mb-3 text-left">Subjects List</h3>
+                            {/* Right side - Subjects List */}
+                            <div className="border dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
+                                <h3 className="font-semibold mb-3 text-left text-gray-900 dark:text-gray-100">Subjects List</h3>
                                 <div className="relative mb-3">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                                    <input type="text" placeholder="Search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-3 py-2 border rounded-md" />
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
+                                    <input
+                                        type="text"
+                                        placeholder="Search"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full pl-10 pr-3 py-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400"
+                                    />
                                 </div>
                                 <div className="space-y-2 max-h-96 overflow-y-auto">
                                     {filteredSubjects.map(subj => (
-                                        <div key={subj.id} onClick={() => setFormData({ ...formData, name: subj.name, label: subj.label, color: subj.color })} className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                                            <div className="flex items-center gap-3"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: subj.color }} /><span className="font-medium text-left">{subj.name}</span></div>
-                                            <span className="text-sm text-gray-500">{subj.label}</span>
+                                        <div
+                                            key={subj.id}
+                                            onClick={() => setFormData({ ...formData, name: subj.name, label: subj.label, color: subj.color })}
+                                            className="flex items-center justify-between p-3 border dark:border-gray-600 rounded-lg cursor-pointer bg-white dark:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: subj.color }} />
+                                                <span className="font-medium text-left text-gray-900 dark:text-gray-100">{subj.name}</span>
+                                            </div>
+                                            <span className="text-sm text-gray-500 dark:text-gray-300">{subj.label}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex justify-between mt-6">
-                            <button onClick={onRemove} className="px-4 py-2 text-red-500 hover:bg-red-50 rounded">Remove Subject</button>
-                            <button onClick={() => onSave(formData)} className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Save Subject</button>
+                        {/* Action buttons: Remove and Save side-by-side at the bottom */}
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={onRemove}
+                                className="px-6 py-2 border border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
+                            >
+                                Remove Subject
+                            </button>
+                            <button
+                                onClick={() => onSave(formData)}
+                                className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                            >
+                                Save Subject
+                            </button>
                         </div>
 
-                        {/* Time picker modals - now defined outside so they work */}
+                        {/* Time picker modals */}
                         {showStartTimePicker && <TimePickerModal isOpen={showStartTimePicker} onClose={() => setShowStartTimePicker(false)} onSet={(h,m) => setFormData({ ...formData, startTime: `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}` })} title="Set time start" />}
                         {showEndTimePicker && <TimePickerModal isOpen={showEndTimePicker} onClose={() => setShowEndTimePicker(false)} onSet={(h,m) => setFormData({ ...formData, endTime: `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}` })} title="Set time end" />}
                     </div>
@@ -359,8 +443,24 @@ export default function WeeklySchedule() {
 
             <EditModal isOpen={editModalOpen} onClose={() => { setEditModalOpen(false); setSelectedEvent(null); }} subject={selectedEvent} subjects={subjects} onSave={handleSaveEvent} onRemove={handleRemoveEvent} />
 
-            <SaveConfirmModal isOpen={saveModalOpen} onClose={() => { setSaveModalOpen(false); setPendingEventData(null); }} onConfirm={confirmSave} subject="subject" />
-            <RemoveConfirmModal isOpen={removeModalOpen} onClose={() => setRemoveModalOpen(false)} onConfirm={confirmRemove} subject="subject" />
+            {/* Save Confirmation Modal - shows toast, keeps edit modal open */}
+            <SaveConfirmModal
+                isOpen={saveModalOpen}
+                onClose={() => {
+                    setSaveModalOpen(false);
+                    setPendingEventData(null);
+                }}
+                onConfirm={confirmSave}
+                subject="subject"
+            />
+
+            {/* Remove Confirmation Modal - shows toast, keeps edit modal open */}
+            <RemoveConfirmModal
+                isOpen={removeModalOpen}
+                onClose={() => setRemoveModalOpen(false)}
+                onConfirm={confirmRemove}
+                subject="subject"
+            />
         </div>
     );
 }
