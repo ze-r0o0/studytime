@@ -117,7 +117,7 @@ export default function Settings() {
     };
 
     return (
-        <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 pb-8 overflow-auto">
+        <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 pt-30 pb-8 overflow-auto">
             {/* Toast notification container (bottom-right) */}
             <Toaster
                 position="bottom-right"
